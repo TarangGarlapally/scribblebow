@@ -280,8 +280,8 @@ function WriteStory(props)
             "genre": StoryStatus.StoryGenre , 
             "hashtags": typeof StoryStatus.StoryHashtags === 'string' ?StoryStatus.StoryHashtags.split("#"):StoryStatus.StoryHashtags, 
             "description":StoryStatus.StoryDescription , 
-            "nlikes": 0 , 
-            "ncomments":0  , 
+            "nlikes": StoryStatus.nlikes, 
+            "ncomments":StoryStatus.ncomments  , 
             "published": PubSaveButton,
             "titlekeys": Atts.Subs(StoryStatus.StoryTitle),
             "coverid": CoverId
