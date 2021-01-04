@@ -171,7 +171,7 @@ function WriteStory(props)
         if(image != null)
             UploadFile.UploadImage("CoverPages/",  image ,StoryId , Atts.documentName[props.title]);
         var myStoryData = {
-            "creator": localStorage.getItem("username") , 
+            "creator": StoryStatus.creator , 
             "title": StoryStatus.StoryTitle, 
             "content": StoryStatus.StoryContent, 
             "font":StoryStatus.StoryFont ,

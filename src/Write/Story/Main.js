@@ -46,6 +46,7 @@ class WriteTheStory extends React.PureComponent{
                 
                 var sep ={
                     "id": querySnapshot.id ,
+                    "creator": querySnapshot.data().creator , 
                     "StoryTitle" : querySnapshot.data().title, 
                     "StoryFont":querySnapshot.data().font,
                     "StoryFontSize":"20" , 
@@ -94,7 +95,8 @@ class WriteTheStory extends React.PureComponent{
         else  {
             return (<div><WriteStory StoryDetails ={ this.props.location.state.title ==="Article"?{
 
-                ...this.state.StoryDetails , 
+                ...this.state.StoryDetails ,
+                "creator": localStorage.getItem("username") ,  
                 "StoryContent": new Date().toLocaleString()+","
             } :this.state.StoryDetails} 
             StoryCoverPage = {this.state.StoryCoverPage}
