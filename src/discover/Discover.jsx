@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Header from "../components/NavHeader";
 import Slide from "@material-ui/core/Slide";
 import { TopCreators, SearchResults, ContentArea } from "./DiscoverComps";
+import { Redirect } from "react-router";
 
 
 
@@ -158,6 +159,9 @@ export default class Discover extends React.PureComponent {
         setTimeout(() => this.setState({ swipe2: !this.state.swipe2, dir: "right" }), 500);
     }
     render() {
+        if(!localStorage.getItem("username") ){
+            return <Redirect to={"/Log0"} />;
+        }
         console.log("redering");
         
             return <div style={{ position: "fixed", width: "100%" }}>

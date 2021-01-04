@@ -4,7 +4,7 @@ import Home from './home/home';
 import Login from './login/Login';
 import Signup from './login/Signup';
 import {Test} from './login/Test';
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {BrowserRouter as Router, Redirect, Route} from "react-router-dom";
 import { AuthProvider } from './Auth';
 import ReadStory from './Read/Story/Story' ;  
 import Profile from './Read/Profile/Profile';
@@ -50,6 +50,9 @@ function App(){
  
    //sets audio player
   function setPlayAudio(data, Id){
+    if(!localStorage.getItem("username") ){
+      return <Redirect to={"/Log0"} />;
+  }
     if(play){
       setPlay(false);
     }

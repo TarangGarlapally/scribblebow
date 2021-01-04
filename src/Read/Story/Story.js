@@ -9,6 +9,7 @@ import db from "../../database/db";
 import "firebase/auth";
 import 'firebase/storage';
 import * as firebase from 'firebase';
+import { Redirect } from 'react-router';
 
 class ReadStory extends React.PureComponent{
     
@@ -136,6 +137,16 @@ class ReadStory extends React.PureComponent{
             "title": new URLSearchParams(this.props.location.search).get("title"), 
             "id": new URLSearchParams(this.props.location.search).get("StoryId")
         }  ;
+        if(allProps.title === "Audio"){
+
+                return (<Redirect to={{
+                    pathname: '/ReadAudio',
+                    state: { id: allProps.id , title:allProps.title }, 
+                    search:"?StoryId="+allProps.id+"&title="+allProps.title,
+                    key:{id: allProps.id , title:allProps.title}
+                }} />) ;
+            
+        }
         console.log(allProps);
         this.GetStoryDetails(Atts.documentName[allProps.title],allProps.id) ;
         this.CheckMyShelf(allProps.id)

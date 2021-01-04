@@ -2,6 +2,7 @@ import React from 'react' ;
 import Quote from './QuoteComponents';
 import db from '../../database/db'; 
 import { documentName } from '../../Write/Story/Atts';
+import { Redirect} from "react-router-dom";
 import Header from '../../components/NavHeader';
 import { LoadingPage } from '../../components/Loading';
 import * as Atts from "../../Write/Story/Atts"; 
@@ -79,6 +80,9 @@ export default class ReadQuote extends React.Component
         }
     render()
     {
+        if(!localStorage.getItem("username") ){
+            return <Redirect to={"/Log0"} />;
+        }
         const title = new URLSearchParams(this.props.location.search).get("title");
         var allProps = {
             "title": title, 

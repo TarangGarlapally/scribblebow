@@ -3,11 +3,14 @@ import * as User from './ProfileFuns' ;
 import NavHeader from '../../components/NavHeader';
 import db from '../../database/db' ; 
 import Loading, { LoadingPage } from '../../components/Loading';
+import { Redirect } from 'react-router';
 
 
 function Profile(props)
 {
-    
+    if(!localStorage.getItem("username") ){
+        return <Redirect to={"/Log0"} />;
+    }
     let UserId ; 
     UserId =  new URLSearchParams(props.location.search).get("UserId") ;
     if (UserId == null) UserId = localStorage.getItem('username') ; 
