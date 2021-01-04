@@ -20,8 +20,11 @@ function WriteStory(props)
     const  [image , setImage] = useState(null) ;  
     const [stage , setStage] = useState(0) ;
     const [StoryId , setStoryId] = useState("") ; 
-    const [openSnackbar , setSnackbar] = useState(false) ;  
+    const [openSnackbar , setSnackbar] = useState(false) ;
+    const [snackMessage, setSnackMessage] = useState("");
     const [prePub , setPrePub] = useState(StoryStatus.published) ; 
+    const [snackColor, setSnackColor] = useState("success");
+  
     function handleImageChange(event)
     {
         var ImageFile =event.target.files[0] ;  
@@ -62,6 +65,105 @@ function WriteStory(props)
             ShowHashtagsElement.appendChild(h3); 
         }); 
     }
+
+    async function addCollab(uname){
+        var uexists = false
+        await db.firestore().collection("users").doc(uname).get().then((snapshot)=>{
+            uexists = snapshot.exists;
+        })
+        if(uexists){
+            db.firestore().collection(Atts.documentName[props.title]).doc(props.StoryDetails.id).update({
+                collab: firebase.firestore.FieldValue.arrayUnion({username: uname, status: false})
+            }).then((error)=>{
+                if(error){
+                    setSnackMessage("Invitation Failed");
+                    setSnackColor("danger");
+                    setSnackbar(true);
+                    setTimeout(()=>{setSnackbar(false)},5000);
+                }else{
+                    if(props.StoryDetails.collab===""){
+                        props.StoryDetails.collab = [{username: uname, status: false}];
+                    }
+                    else{
+                        props.StoryDetails.collab.push({username: uname, status: false})
+                    }
+                    setSnackMessage("Invited");
+                    setSnackColor("success");
+                    setSnackbar(true);
+                    setTimeout(()=>{setSnackbar(false)},5000);
+                }
+            });
+        }else{
+            setSnackMessage("User doesn't exist.");
+            setSnackColor("danger");
+            setSnackbar(true);
+            setTimeout(()=>{setSnackbar(false)},5000);
+        }
+    }
+
+
+
+    function collabFormSubmit(event){
+        event.preventDefault();
+        const uname = event.target.username.value;
+        if(uname === localStorage.getItem("username"))
+        alert("You cannot add yourself as a collaborator.  -_-");
+        else if(props.StoryDetails.collab !== ""){
+            var index = -1;
+            for(var i=0;i<props.StoryDetails.collab.length;i=i+1){
+                if(props.StoryDetails.collab[i].username === uname){
+                    index = i;
+                    break
+                }
+            }
+            if(index !== -1 && props.StoryDetails.collab[index].status === false){
+                setSnackMessage("Already Invited");
+                setSnackColor("danger");
+                setSnackbar(true);
+                setTimeout(()=>{setSnackbar(false)},5000);
+            }
+            else if(index !== -1 && props.StoryDetails.collab[index].status === true){
+                setSnackMessage("Already a collaborator");
+                setSnackColor("danger");
+                setSnackbar(true);
+                setTimeout(()=>{setSnackbar(false)},5000);
+            }
+            else{
+                addCollab(uname);
+            }
+        }else{
+            addCollab(uname);
+        }
+
+    }
+
+
+    function delCollab(uname,index){
+        
+        db.firestore().collection(Atts.documentName[props.title]).doc(props.StoryDetails.id).update({
+            collab: firebase.firestore.FieldValue.arrayRemove({username: uname, status: true})
+        }).then((error)=>{
+            if(error){
+                setSnackMessage("Could not remove the collaborator!");
+                setSnackColor("danger");
+                setSnackbar(true);
+                setTimeout(()=>{setSnackbar(false)},5000);
+            }else{
+                props.StoryDetails.collab.splice(index,0);
+                if(props.StoryDetails.collab.length===0){
+                    props.StoryDetails.collab = "";
+                }
+                
+                setSnackMessage("Successfully removed the collaborator. Refresh to see changes.");
+                setSnackColor("success");
+                setSnackbar(true);
+                setTimeout(()=>{setSnackbar(false)},5000);
+                
+            }
+        })
+    }
+
+
    function handleStoryStatus(event)
    {
         var {name,value} = event.target;
@@ -136,7 +238,7 @@ function WriteStory(props)
         ArticleType=null ; 
        
     }
-    if(props.title !="Fanfiction") fanFiction =null ; 
+    if(props.title !=="Fanfiction") fanFiction =null ; 
 
     function handleReset()
     {
@@ -157,7 +259,7 @@ function WriteStory(props)
     function handleSubButton(event)
     {
         var element  = event.target.name  ; 
-        if(element == "Published") PubSaveButton = true  ; else PubSaveButton = false  ; 
+        if(element === "Published") PubSaveButton = true  ; else PubSaveButton = false  ; 
     }
     function handleSubmit(event)
     {
@@ -184,9 +286,9 @@ function WriteStory(props)
             "titlekeys": Atts.Subs(StoryStatus.StoryTitle),
             "coverid": CoverId
         } ; 
-        if(props.title == "Article") myStoryData = {...myStoryData  , "type":StoryStatus.ArticleType} ; 
-        if(props.title =="Fanfiction") myStoryData ={...myStoryData ,"basedOn":StoryStatus.FictionBasedOn} ; 
-        if (props.title == "Story"|"Poem"|"Fanfiction") myStoryData = {...myStoryData , "part": StoryStatus.part} ;      
+        if(props.title === "Article") myStoryData = {...myStoryData  , "type":StoryStatus.ArticleType} ; 
+        if(props.title ==="Fanfiction") myStoryData ={...myStoryData ,"basedOn":StoryStatus.FictionBasedOn} ; 
+        if (props.title === "Story"|"Poem"|"Fanfiction") myStoryData = {...myStoryData , "part": StoryStatus.part} ;      
         console.log(myStoryData)  ;
         db.firestore().collection(Atts.documentName[props.title]).doc(StoryId).get().then(qs=>{
             
@@ -196,7 +298,10 @@ function WriteStory(props)
 
                
                 if(!PubSaveButton){
+                    setSnackMessage(!PubSaveButton ? "your "+props.title+" has been Saved" : "your "+props.title+ " has been Published");
+                    setSnackColor("success");
                     setSnackbar(true) ; 
+                    
                     history.push(
                         {
                             pathname:'/WriteStory', 
@@ -218,6 +323,8 @@ function WriteStory(props)
             setStoryId(StoryId); 
             if(!PubSaveButton)
             {
+                setSnackMessage(!PubSaveButton ? "your "+props.title+" has been Saved" : "your "+props.title+ " has been Published");
+                setSnackColor("success");
                 setSnackbar(true) ; 
             }
             else 
@@ -237,6 +344,8 @@ function WriteStory(props)
                     [tempAtts] : firebase.firestore.FieldValue.increment(1)   
                 }) ; 
                 }
+                setSnackMessage(!PubSaveButton ? "your "+props.title+" has been Saved" : "your "+props.title+ " has been Published");
+                setSnackColor("success");
                 setSnackbar(true) ; 
                 setStage(5) ;
                 setTimeout(()=>{setStage(4)},6000) ; 
@@ -247,6 +356,24 @@ function WriteStory(props)
            
        
     } 
+
+    function CollabTiles(myprops){
+        if(props.StoryDetails.collab !== ""){
+        return  props.StoryDetails.collab.map((collaborator,index)=>{
+            if(collaborator.status===true){
+                return <div>
+                            <p className="col-12 col-sm-9">{collaborator.username}</p>
+                            <p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,index)}><i class="fas fa-times-circle"></i></p>
+                        </div>
+            }else{
+                return null;
+            }
+        });
+    }else{
+            return null;
+                            
+    }
+    }
     // var StoryTitles = StoryFuns.getStoryDetails(Atts.documentName[props.title]);   
     if(stage == 0 )
     {
@@ -293,11 +420,11 @@ function WriteStory(props)
                                 <h4>Part</h4><input className={Atts.propsClass} style={{width:"80px" }} type="number" onChange={handleStoryStatus} name="part"
                                  value={StoryStatus.part}></input>
                                 {UploadImage}
-                                
+                                <br />
                                 
             
                         </div>
-                        <div className= "col-12 col-md-9 " >
+                        <div className= "col-12 col-md-7" >
                             <div className="myshadow"style={{ alignItem: "center" , padding:"100px" , paddingTop:"30px" , overflowX:"auto"}}>
                             <div className = "alert alert-success" style={{width:"595px" , textAlign:"center"}} name="StoryTitle">{StoryStatus.StoryTitle}</div>
                         
@@ -315,23 +442,60 @@ function WriteStory(props)
                             </div>
                             
                         </div>
+                        <div className="col-12 col-md-2">
+                        <input type="button" className = "btn btn-default mybtn" data-toggle="modal" data-target="#CollabModal" value="Add a Collaborator"></input>
+                        <br />
+                        <h4 style={{marginLeft:"10px"}}><b>Collaborators</b></h4>
+                        {
+                            <CollabTiles />
+                        }
+                        
+                        </div>
                         </form>
 
-                        <MySnackBar message= {!PubSaveButton ? "your "+props.title+" has been Saved" : "your "+props.title+ " has been Published"}
+                        <div id="CollabModal" className="modal fade" role="dialog" style={{marginTop:"50px"}}>
+                                        <div className="modal-dialog"  >
+                                            <div className="modal-content" >
+                                            <div className="modal-header">
+                                                <strong  style={{color:"black"}}>Add a Collaborator</strong>
+                                            </div>
+                                            <div className="modal-body" >
+                                                        <div className="">
+                                                                <p>A collaborator will be able to edit or delete your content. <i><b>"Choose your mate wisely."</b></i></p>
+                                                                <p>Enter the username of the person you want to add as a collaborator.</p>
+                                                                <form onSubmit={collabFormSubmit}>
+                                                                    <input type="text" placeholder="Enter username" name="username"  required></input>
+                                                                    <br /><button className="btn btn-sm btn-success" id="sendInvite" style={{marginTop:"2px"}}
+                                                                    type="submit"
+                                                                    >Invite</button>
+                                                                </form>
+                                                         </div>
+                                            </div>
+                                            <div className="modal-footer">
+                                                
+                                                <button type="button" className="btn btn-default" data-dismiss="modal" style={{width:"100px" , marign:"5px"}}>Close</button>
+                                            </div>
+                                            </div>
+
+                                        </div>
+                                </div>
+
+                        <MySnackBar message= {snackMessage}
                             open = {openSnackbar}
                             key ={openSnackbar}
+                            color = {snackColor}
                         />
                     </div>
                 ) ; 
     } 
-    else if (stage == 4 ){
+    else if (stage === 4 ){
         return (<Redirect to={{
             pathname: '/ReadStory',
             state: { id: StoryId , title:props.title }, 
             search:"?StoryId="+StoryId+"&title="+props.title,
             key:{id: StoryId , title:props.title}
         }} />) ;}
-    else if(stage == 5)
+    else if(stage === 5)
     {
         return(<Loading message={"Your"+props.title+ "is Getting Uploaded"}/>) ;
          

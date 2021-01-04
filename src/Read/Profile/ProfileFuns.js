@@ -310,8 +310,8 @@ export const UserDetails  = function (props)
                 <p>Bio: {allprops.bio}</p>
                 {allprops.website?<p>Website: <a href= {allprops.website}  target="_blank">{allprops.website}</a> </p>:null}
                 <br></br>
-                {allprops.audio>0?<audio controls style={{outline:"none"}} loop controlsList="nodownload">
-                      <source  src= {process.env.PUBLIC_URL + "mysong.mp3"} type="audio/mp3" ></source>
+                {allprops.audiobow?<audio controls style={{outline:"none"}} loop controlsList="nodownload">
+                      <source  src= {allprops.audiobow} type="audio/mp3" ></source>
                   </audio>:null}
             </div>
             

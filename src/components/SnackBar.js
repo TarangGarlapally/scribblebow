@@ -41,10 +41,10 @@ export default class MySnackBar extends React.Component {
     
     >
 <SnackbarContent style={{
-  backgroundColor:'#4BB543',
+  backgroundColor:this.props.color === "danger"? '#ffae42' :'#4BB543',
   fontSize: 14
 }}
-message={<span id="client-snackbar"><i class="fa fa-check" aria-hidden="true"></i> &nbsp;&nbsp;{this.props.message}</span>}
+message={<span id="client-snackbar"><i class={this.props.color === "danger" ? "fa fa-close":"fa fa-check"} aria-hidden="true"></i> &nbsp;&nbsp;{this.props.message}</span>}
 action={
       <React.Fragment>
         

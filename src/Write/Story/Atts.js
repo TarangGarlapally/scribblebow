@@ -40,7 +40,7 @@ var GenreColors = {
     "Article": "/WriteStory",
     "fanfiction": "/WriteStory",
     "Audio": "/recorder",
-    "Script": "/WriteScript"
+    "Script": "/WriteStory"
 };
 
 

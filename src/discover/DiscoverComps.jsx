@@ -89,7 +89,7 @@ export function TopUserTile(myprops) {
                     state: { id: myprops.uobj[1] },
                 })} style={{ backgroundColor: "#f5ba13", height: "30px", width: "30px", borderRadius: "50%" }}>{myprops.uobj[0].fname[0].toUpperCase() + myprops.uobj[0].lname[0].toUpperCase()}</Avatar>}
         </div>
-        <a href="" className="tcreator-tile-a" onClick={() => history.push({
+        <a  className="tcreator-tile-a pointer" onClick={() => history.push({
             pathname: '/Profile',
             search: '?UserId=' + myprops.uobj[1],
             state: { id: myprops.uobj[1] },

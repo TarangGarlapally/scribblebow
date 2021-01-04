@@ -8,10 +8,10 @@ function Loading(props){
     <div className="login-bg">
     <div className="login-bar2">
     <div className="col-md-6">
-    <img  className= "loading" src={process.env.PUBLIC_URL + '/loading-nobg.gif'}/>
+    <img  className= "loading" alt = "loading" src={process.env.PUBLIC_URL + '/loading-nobg.gif'}/>
     </div>
     <div className="col-md-6">
-    <img className="signuplogo2" src={process.env.PUBLIC_URL + '/myimage.png'}/>
+    <img className="signuplogo2" alt = "signup logo" src={process.env.PUBLIC_URL + '/myimage.png'}/>
     <p className="loading-text font0" id="loading-text">{props.message}</p>
     </div> 
     </div>
@@ -23,10 +23,10 @@ function LoadingPage(props)
 {
     return(
         <div>
-            <Header title="Please Wait"/>
+            {props.head==="no"?null:<Header title="Please Wait"/>}
             <div className="container " style={{display:'flex', justifyContent:"center"}}>
             <ul style={{listStyle:"none" , textAlign:"center" }}>
-                <li><img src = {process.env.PUBLIC_URL + "ripple-nobg.gif"} ></img></li>
+                <li><img alt = "loading" src = {process.env.PUBLIC_URL + "ripple-nobg.gif"} ></img></li>
                 <li><h1>{props.message}</h1></li>
             </ul>
             

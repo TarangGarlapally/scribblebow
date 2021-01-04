@@ -381,7 +381,7 @@ export default function QuoteEditor(props)
         }
     else if(stage == 5)
     {
-        return(<LoadingPage message={"Your"+props.title+ "is Getting Uploaded"}/>) ;
+        return(<LoadingPage head={"no"} message={"Your"+props.title+ "is Getting Uploaded"}/>) ;
          
     }
    

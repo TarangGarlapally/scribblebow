@@ -56,6 +56,7 @@ class WriteTheStory extends React.PureComponent{
                     "StoryDescription":querySnapshot.data().description,
                     "StorySeries":"",
                     "part":querySnapshot.data().part,
+                    "collab":("collab" in  querySnapshot.data())?querySnapshot.data().collab:"",
                     "PublishSave" : false , 
                     "ArticleType": ("type" in  querySnapshot.data())?querySnapshot.data().type:"Personal Blog",
                     "FictionBasedOn":("basedOn" in  querySnapshot.data())?querySnapshot.data().basedOn:"",

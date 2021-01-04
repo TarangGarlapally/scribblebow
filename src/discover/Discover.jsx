@@ -53,7 +53,8 @@ export default class Discover extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.state = { swipe: true,category:"", recid: 0, dir: "right", searchkey: "" };
+        var tag = new URLSearchParams(this.props.location.search).get("tag") ;
+        this.state = { swipe: true,category:"", recid: 0, dir: "right", searchkey: tag?"#"+tag:"" };
     }
 
 
@@ -113,6 +114,9 @@ export default class Discover extends React.PureComponent {
 
 
 
+    handleChange(event){
+        this.setState({searchkey:event.target.value});
+    }
 
     handleCat=(myprops)=>{
     this.setState({category:myprops})
@@ -162,7 +166,7 @@ export default class Discover extends React.PureComponent {
                     <div align="center" className="search-bar">
                         <form className="form-inline search-form" onSubmit={this.handleSearch}>
                             <div className="form-group search-input-group" >
-                                <input className="form-control" style={{ width: "100vh" }} type="text" name="searchinput" placeholder="Search..." />
+                                <input className="form-control" style={{ width: "100vh" }} onChange={e=>this.handleChange(e)} type="text" name="searchinput" value={this.state.searchkey} placeholder="Search..." />
                             </div>
                             <button type="submit" name="submit" className="btn btn-warning mybtn search-submit" ><span className="glyphicon glyphicon-search"></span></button>
 

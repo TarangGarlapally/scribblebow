@@ -1,4 +1,4 @@
-import React ,{useState}from 'react' ; 
+import React ,{useEffect, useState}from 'react' ; 
 import * as icons from 'react-icons/md';
 import Fab from "@material-ui/core/Fab";
 import Zoom from "@material-ui/core/Zoom";
@@ -17,6 +17,7 @@ function StoryDetails(props)
         ...props.Details , 
     }
     const history = useHistory();
+    const [invite,setInvite] = useState(false);
     const [isExpanded , setExpanded] = useState({
         comments:false  , 
         EditnDelete:false , 
@@ -29,6 +30,7 @@ function StoryDetails(props)
         }
     );
 
+    
     const [myShelf , setMyShelf] = useState(props.myShelf) ;
     const [ReportStory, setReportStory] = useState({
         message : "" , 
@@ -38,9 +40,31 @@ function StoryDetails(props)
     console.log(LikeCommentCount , myShelf); 
     
     const [AllStoryComments , setAllComments] = useState([]) ;
+    
     console.log("Storuy commets0"); 
     console.log(AllStoryComments); 
     var Hashtags = myStoryDetails.hastags ; 
+
+
+    useEffect(()=>{
+            try{
+                if(myStoryDetails.collab === ""){
+                    setInvite(false);
+                }
+                else{
+                    myStoryDetails.collab.forEach(collaborator=>{
+                        if(collaborator.username === localStorage.getItem("username") && collaborator.status===false){
+                            setInvite(true);
+                        }
+                        
+                    });
+                }
+            }catch(err){
+                setInvite(false);
+            }
+        
+    },[myStoryDetails.collab]);
+
     function expand() {
         setExpanded(preExpand =>{
             return ({
@@ -128,7 +152,7 @@ function StoryDetails(props)
                 });
         }
          
-        if(CommentButton == "Back to Read "+ props.title)
+        if(CommentButton == "Back to "+ props.title)
             handleStoryAllComment(); 
             
         setExpanded(preExpand =>{
@@ -157,6 +181,8 @@ function StoryDetails(props)
 
         setMyShelf(!myShelf) ; 
     }
+
+
     function handleStoryAllComment()
     {   
         var StoryContentElement =  document.getElementById("StoryContent") ;
@@ -165,7 +191,7 @@ function StoryDetails(props)
         {
             StoryContentElement.style.display = "none" ; 
             CommentSection.style.display ="block" ; 
-            setCommentButton("Back to Read "+ props.title ); 
+            setCommentButton("Back to "+ props.title ); 
 
         }
         else{
@@ -198,8 +224,27 @@ function StoryDetails(props)
     {!myShelf?<icons.MdAdd  size="30"/>:<icons.MdCheck size="30"/>}<Caption caption={!myShelf?"Shelf":"Added"}/>
     </div>:null}
 </div>  ; 
+    var creatorState = ()=>{
+        try{
+        if(myStoryDetails.collab === ""){
+            return false;
+        }else{
+            var status = false;
+            myStoryDetails.collab.forEach(collaborator=>{
+                if(collaborator.username === localStorage.getItem("username") && collaborator.status===true){
+                    status = true;
+                }
+                
+            });
+            return status;
+            
+        }
+    }catch(err){
+        return false;
+    }
+    }
     var EditStory =<div className="container-inner" style={{ display:"flex",justifyContent:"flex-end",  backgroundColor:"", padding:"10px"}}>
-    {localStorage.getItem('username') === myStoryDetails.creator?<button className="btn btn-default" onClick={()=>{
+    {localStorage.getItem('username') === myStoryDetails.creator || creatorState()?<button className="btn btn-default" onClick={()=>{
 
         history.push({pathname:'/WriteStory', 
                         state: { id: myStoryDetails.myid , title:props.title , new:false }, 
@@ -321,7 +366,7 @@ function StoryDetails(props)
                         })
                 }}>{myStoryDetails.creator}</p>
                 <div className= "row container">
-                    <a href ="/ReadStory?genre=comedy" ><span className="badge bg-white border box">{myStoryDetails.genre}</span></a>
+                    <a href ="#" ><span className="badge bg-white border box">{myStoryDetails.genre}</span></a>
                 </div> 
                 <hr />
                 <p>Description: {myStoryDetails.description}</p>
@@ -336,6 +381,7 @@ function StoryDetails(props)
                     }): null}
                 </div>
                 {LikeCommentAdd}
+                <Reader content={myStoryDetails.content}/>
                 <div name= "EditnDelete" className= "handy" onClick ={expandEditnDelete} style={{display : currLoc !="/ReadStory" ?"none":"flex" , justifyContent:"flex-end" }}
                 ><img src={process.env.PUBLIC_URL +"3Dots.png"}  style={{ maxHeight:"40px" , maxWidth:"40px"}} ></img></div>
                 
@@ -380,10 +426,53 @@ function StoryDetails(props)
                             title = {props.title}
                             />
                 </div>
-            
+                
+            {invite===true?
+            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id}/>
+            :null
+            }
         </div>
     ); 
 }
+
+function AcceptInvite(props){
+
+   
+    function declineReq(){
+        db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
+            collab: firebase.firestore.FieldValue.arrayRemove({username: localStorage.getItem("username"),status:false})
+        }).then((err)=>{
+            window.location.reload(false);
+        });
+    }
+
+    function acceptReq(){
+        db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
+            collab: firebase.firestore.FieldValue.arrayRemove({username: localStorage.getItem("username"),status:false})
+        }).then(err=>{
+            db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
+                collab: firebase.firestore.FieldValue.arrayUnion({username: localStorage.getItem("username"),status:true})
+            }).then(err=>{
+                window.location.reload(false);
+            });
+        })
+    }
+
+    return <div className="col-12 myshadow" style={{position:"absolute",bottom:"20px",right:"40px",borderRadius:"4%",zIndex:"200",width:"300px",height:"200px",backgroundColor:"white"}}>
+    <div className="col-12 " style={{padding:"5px",paddingTop:"35px",height:"150px",width:"300px",borderTopLeftRadius:"4%",borderTopRightRadius:"4%",textAlign:"center", backgroundColor:"white",borderBottom:"1px solid grey"}}>
+        <h5><b><span style={{color:"green"}}>{props.details.creator}</span></b> invited you to collaborate on this {props.title}</h5>
+    </div>
+    <div className="col-12 " style={{height:"50px",width:"300px",borderBottomLeftRadius:"8%",borderBottomRightRadius:"8%" }}>
+    <div className="col-12 col-md-6 pointer hov" onClick={acceptReq} style={{paddingTop:"10px",height:"50px",width:"150px",borderRight:"1px solid grey",textAlign:"center"}}>
+    <h5 style={{color:"green"}}><b>Accept</b></h5>
+    </div>
+    <div className="col-12 col-md-6 pointer hov" onClick={declineReq} style={{paddingTop:"10px", height:"50px",width:"150px",borderRight:"1px solid grey",textAlign:"center"}}>
+    <h5 style={{color:"red"}}><b>Decline</b></h5>
+    </div>
+    </div>
+    </div>
+}
+
 function StoryContent(props)
 {
     return (
@@ -645,3 +734,31 @@ export {StoryContent , StoryDetails , CoverPage , Comments};
 //     }
     
 // }
+
+
+
+
+class Reader extends React.Component{
+    // constructor(props){
+    //     super(props);
+    //     this.state = {content:this.props.content}
+    //     this.synth = window.speechSynthesis;
+    // }
+    
+
+
+    // readAloud = ()=>{
+    //     var utterThis = new SpeechSynthesisUtterance(this.state.content);
+    //     this.synth.speak(utterThis);
+    //     console.log(this.props.content);
+    // }
+    // PauseAudio = ()=>{
+    //     this.synth.pause();
+    // }
+    render(){
+        return <div>
+        {/* <a onClick={()=>{this.readAloud();}}>Read Aloud</a>
+        <a onClick={()=>{this.PauseAudio();}}>Pause</a>
+         */}</div>
+    }   
+}

@@ -21,7 +21,8 @@ function Home(props){
         
            <Header title="HOME" logged={logged}/> 
           
-          {currentLocation == "/home" ? aboutUs : null }
+          
+          {aboutUs}
           {categoryAvailable.map(eachCat =>{ return( <funs.FamousStories title={eachCat} setPlayAudio={eachCat==="Audio"?props.setPlayAudio:null}/> ) ; })}
            
         </div>

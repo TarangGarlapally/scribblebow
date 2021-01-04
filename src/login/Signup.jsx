@@ -71,6 +71,7 @@ function Signup(props) {
             {
                 alert("Account with this email already exists, please refresh the page to sign in or sign up with another email")
             }
+            history.push("/signup");
         }   
     }
 
