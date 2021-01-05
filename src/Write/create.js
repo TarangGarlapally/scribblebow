@@ -5,6 +5,7 @@ import {  useHistory } from 'react-router';
 import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import Zoom from "@material-ui/core/Zoom";
+import sendNotif from "../Notifications/client" ; 
 
 
 
@@ -31,7 +32,7 @@ function Create(props) {
     function SelectButtons() {
         console.log("the buttons");
         return <div className=" container myscroller-notrack" style={{ display: "flex", overflowX: "auto", justifyContent: "" }} >
-            <a className="btn create-btn" style={{ backgroundColor: "#E61D42", marginBottom: "10px", fontWeight: "bold" }} onClick={() => { setCategory("Story") }}>Story</a>
+            <a className="btn create-btn" style={{ backgroundColor: "#E61D42", marginBottom: "10px", fontWeight: "bold" }} onClick={() => { sendNotif() ;setCategory("Story");  }}>Story</a>
             <a className="btn create-btn" style={{ backgroundColor: "#FF7F00", marginBottom: "10px", fontWeight: "bold" }} onClick={() => { setCategory("Poem") }}>Poem</a>
             <a className="btn create-btn" style={{ backgroundColor: "#FFED07", marginBottom: "10px", fontWeight: "bold" }} onClick={() => { setCategory("Quote") }}>Quote</a>
             <a className="btn create-btn" style={{ backgroundColor: "#74E03E", marginBottom: "10px", fontWeight: "bold" }} onClick={() => { setCategory("Article") }}>Blog/Article</a>
@@ -72,7 +73,7 @@ function Create(props) {
                             fontSize: "36px", marginTop: "20px", marginBottom: "-20px", marginRight: "5%"
                         }} onClick={()=>{ if(category!=="works"){
 
-                            
+                                 
                                 history.push({pathname: categoryPathName[category], 
                                     state: { id: "" , title:category , new:true }, 
                                     key:{id: "" , title:category, new:true}
