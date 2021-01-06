@@ -26,6 +26,28 @@ import ReadQuote from './Read/Quote/Main';
 import db from "./database/db";
 
 
+
+
+
+
+const messaging = db.messaging();
+messaging.requestPermission().then(function(){
+  console.log("Recieved Permission");
+  return messaging.getToken();
+})
+.then(function(token){
+  console.log("token "+token);
+})
+.catch(function(err){
+  console.log("Denied Permission")
+})
+
+messaging.onMessage(function(payload){
+  console.log("onMessage: "+payload);
+})
+
+
+
 function App(){
   const [play, setPlay] = useState(false);
   const [data,setData] = useState();
