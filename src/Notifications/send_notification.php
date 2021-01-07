@@ -13,7 +13,9 @@ function sendNotification(){
     );
 
     $headers=array(
-        'Authorization: key=AAAA1qyN3CQ:APA91bHoBSMgXvVF642CYjspEhWvj9pIxUTmxnRhE4k0T8psOURcKZk9m0JWoyzM1hYlR9RTLQkbDUscgmkwXXzaZB5Vb4FZbLB1QtEggxCnGfoc3XUlTCaMO3l4Hwa9nRnbKjE-prk1',
+        'Authorization: key=AAAA1qyN3CQ:APA91bHoBSMgXvVF642CYjspEhWvj9pIxUTmxnR
+        hE4k0T8psOURcKZk9m0JWoyzM1hYlR9RTLQkbDUscgmkwXXzaZB5Vb4
+        FZbLB1QtEggxCnGfoc3XUlTCaMO3l4Hwa9nRnbKjE-prk1',
         'Content-Type:application/json'
     );
 

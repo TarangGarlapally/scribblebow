@@ -24,8 +24,9 @@ import WriteQuote from './Write/Quote/Main';
 import { Recorder } from './AudioUI/Recorder';
 import ReadQuote from './Read/Quote/Main';
 import db from "./database/db";
+import pn  from './Notifications/client' ; 
 
-
+pn() ; 
 function App(){
   const [play, setPlay] = useState(false);
   const [data,setData] = useState();
