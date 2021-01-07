@@ -40,11 +40,11 @@ messaging.requestPermission().then(function(){
 })
 .catch(function(err){
   console.log("Denied Permission")
-})
+});
 
 messaging.onMessage(function(payload){
   console.log("onMessage: "+payload);
-})
+});
 
 
 
