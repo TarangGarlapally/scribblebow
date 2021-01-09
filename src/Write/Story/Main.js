@@ -23,6 +23,7 @@ class WriteTheStory extends React.PureComponent{
             "StorySeries":"",
             "part":0,
             "nlikes":0,
+            "collab":"",
             "ncomments":0,
             "creator":"",
             "PublishSave" : true , 
