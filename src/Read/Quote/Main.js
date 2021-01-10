@@ -16,7 +16,10 @@ export default class ReadQuote extends React.Component
 
     shouldComponentUpdate(nextProps , nextState )
     {
-         if(this.props === nextProps &&  this.state.id === nextState.id && this.state.stage ===  nextState.stage) return false  ; 
+         if(this.props == nextProps &&  
+            this.state.id == nextState.id && 
+            this.state.stage ==  nextState.stage) 
+            return false  ; 
          else return true  ; 
     }
     getQuoteDetails(collecName , QuoteId)

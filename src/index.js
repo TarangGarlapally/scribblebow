@@ -7,30 +7,9 @@ import ScribblePlayer from './AudioUI/ScribblePlayer';
 import PrivateRoute from './PrivateRoute';
 
 import db from "./database/db";
+import pn  from './Notifications/client' ; 
 
-
-
-
-
-
-const messaging = db.messaging();
-messaging.requestPermission().then(function(){
-  console.log("Recieved Permission");
-  return messaging.getToken();
-})
-.then(function(token){
-  console.log("token "+token);
-})
-.catch(function(err){
-  console.log("Denied Permission")
-});
-
-messaging.onMessage(function(payload){
-  console.log("onMessage: "+payload);
-});
-
-
-
+pn() ; 
 function App(){
   const [play, setPlay] = useState(false);
   const [data,setData] = useState();

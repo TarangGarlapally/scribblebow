@@ -14,4 +14,24 @@ var firebaseConfig = {
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
-  const messaging = firebase.messaging();
+  const messaging = firebase.messaging() ; 
+
+  messaging.onMessage((payload)=>{
+    console.log(payload  , "I am the Payload over the hey load" );
+    const notification=JSON.parse(payload);
+    const notificationOption={
+        body:notification.body,
+        icon:notification.icon
+    };
+    return self.registration.showNotification(payload.notification.title,notificationOption);
+  }); 
+  
+    messaging.setBackgroundMessageHandler(function (payload) {
+      console.log(payload  , "I am the Payload over the hey load" );
+      const notification=JSON.parse(payload);
+      const notificationOption={
+          body:notification.body,
+          icon:notification.icon
+      };
+      return self.registration.showNotification(payload.notification.title,notificationOption);
+  });
