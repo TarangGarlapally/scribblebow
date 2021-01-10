@@ -1,28 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom';
-import Home from './home/home';
-import Login from './login/Login';
-import Signup from './login/Signup';
-import {Test} from './login/Test';
-import {BrowserRouter as Router, Redirect, Route} from "react-router-dom";
+
+import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom";
 import { AuthProvider } from './Auth';
-import ReadStory from './Read/Story/Story' ;  
-import Profile from './Read/Profile/Profile';
-import Pref0 from './login/Pref0';
-import Pref1 from './login/Pref1';
-import Log0 from './login/Log0';
-import WriteTheStory from './Write/Story/Main' ;
-import Create from './Write/create' ; 
-import PrivateRoute from './PrivateRoute';
-import Unverif from './login/Unverif';
-import Discover from './discover/Discover';
-import Reports from './Write/Report/Reports';
-import StorySeries from './Write/Story/StorySeries' ;
-import Myshelf from './MyShelf/Myshelf';
 import ScribblePlayer from './AudioUI/ScribblePlayer';
-import WriteQuote from './Write/Quote/Main';
-import { Recorder } from './AudioUI/Recorder';
-import ReadQuote from './Read/Quote/Main';
+import PrivateRoute from './PrivateRoute';
+
 import db from "./database/db";
 
 
@@ -83,11 +66,39 @@ function App(){
     setTimeout(()=>{checkLikeAdd(Id)},200)
     
   }
+
+  const Home = lazy(() => import('./home/home'));
+  const Login = lazy(() => import('./login/Login'));
+  const Signup  = lazy(() => import('./login/Signup'));
+  const Test  = lazy(() => import('./login/Test'));
+  const ReadStory  = lazy(() => import('./Read/Story/Story'));  
+  const Profile  = lazy(() => import('./Read/Profile/Profile'));
+  const Pref0  = lazy(() => import('./login/Pref0'));
+  const Pref1  = lazy(() => import( './login/Pref1'));
+  const Log0  = lazy(() => import( './login/Log0'));
+  const WriteTheStory  = lazy(() => import( './Write/Story/Main'));
+  const Create  = lazy(() => import( './Write/create')); 
+  const Unverif  = lazy(() => import( './login/Unverif'));
+  const Discover  = lazy(() => import( './discover/Discover'));
+  const Reports = lazy(() => import( './Write/Report/Reports'));
+  const StorySeries = lazy(() => import( './Write/Story/StorySeries'));
+  const Myshelf = lazy(() => import( './MyShelf/Myshelf'));
+  const WriteQuote = lazy(() => import( './Write/Quote/Main'));
+  const  Recorder  = lazy(() => import( './AudioUI/Recorder'));
+  const ReadQuote = lazy(() => import( './Read/Quote/Main'));
+
+
+
+
   
   return <div>
   <AuthProvider>
   <Router>
-    <div>
+  <Suspense fallback={<div class="myclass">
+	<img src="./myimage.png" alt="logo" style={{height: "80px",width: "auto"}}></img>
+	<p align="center">Loading...</p>
+      </div>}>
+    <Switch>
       <Route exact path="/" render={(props) => <Home setPlayAudio={setPlayAudio} {...props} />  }
       />
       <Route exact path="/home" render={(props) => <Home setPlayAudio={setPlayAudio} {...props} />  }
@@ -126,7 +137,10 @@ function App(){
       <Route exact path="/testnow" component={Test}
       />
 
-    </div>
+    </Switch>
+   
+    </Suspense>
+   
   </Router>
   </AuthProvider>
   {play===true?<ScribblePlayer 

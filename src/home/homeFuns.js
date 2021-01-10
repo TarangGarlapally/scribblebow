@@ -93,14 +93,17 @@ class FamousStories extends React.Component
     render(){
         console.log(this.state.tabslist , "this is the Tablist");
         var tabslist = [];
+        if(this.state.stage=== 0){
         db.firestore().collection(documentName[this.props.title]).where("published","==",true).limit(1).get().then((snapshot) => {
             snapshot.forEach((doc) => {
                 
                 tabslist.push([doc.data(), doc.id, this.props.title]);
+                this.setState({ tabslist: tabslist, stage:4})
             });
             
-            this.setState({ tabslist: tabslist, stage:4})
+           
         });
+    }
 
         return (
             <div className="container">

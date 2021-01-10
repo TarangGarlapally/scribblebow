@@ -6,7 +6,7 @@ import db from "../database/db";
 import { MdLinkedCamera } from "react-icons/md";
 
 
-export const Test = function () {
+export default function Test() {
 
     var currentLocation = window.location.pathname;
     const [email, setEmail] = useState("")

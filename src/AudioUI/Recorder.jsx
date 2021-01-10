@@ -10,7 +10,7 @@ import { LoadingPage } from "../components/Loading";
 
 const audioType = 'audio/webm';
 
-export class Recorder extends React.Component {
+export default class Recorder extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
