@@ -25,15 +25,15 @@ function IntitalizeFireBaseMessaging() {
         setTokenSentToServer(false);
       });
 }
-function sendTokenToServer(token){ 
+function sendTokenToServer(tokens , title , body){ 
     if (!isTokensendTokenToServer()) {
         console.log("keep enought ") ; 
             const postObject={
                 "registration_ids" : ["d4_LsyR_KDpE3CU1nNQVlT:APA91bE8yYznmwgb1UFKhdc0IriAHh2tuVb5fbcgN9LQgse5Uz2NwmtXrzYrvfJC6wTkXMUHsGuBzmdJBGyK0iTwxrKNQFR1-1MSepWrv7rlLnWLrlxz9LyrvpT1BULw1AyJ3LVV3Rhw" , token ],
                 "priority":"high",
                "notification": {
-                   "title":"Liked Your Post",
-                    "body": "the user "+  localStorage.getItem('username')+" liked your Post",
+                   "title":title,
+                    "body": body,
                     "sound": "default" ,
                     "icon": process.env.PUBLIC_URL + '/myimage.png' , 
                    "badge": "50"
