@@ -10,6 +10,7 @@ import Loading from '../../components/Loading';
 import StoryDetails from "../../Read/Story/Details";
 import * as firebase from 'firebase';
 import MySnackBar from "../../components/SnackBar";
+import { sendTokenToServer } from "../../Notifications/client";
 
 function WriteStory(props)
 {
@@ -87,6 +88,47 @@ function WriteStory(props)
                     else{
                         props.StoryDetails.collab.push({username: uname, status: false})
                     }
+                    // //add notif to uname db
+                    // db.firestore().collection('notifications').doc(uname).get().then(qs=>{
+                    //     if(qs.exists){
+                    //         db.firestore().collection('notifications').doc(uname).update({
+                    //             notiflist: firebase.firestore.FieldValue.arrayUnion({
+                    //                 from : localStorage.getItem('username') , 
+                    //                 action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                    //                 contentname : "collab Invite" ,
+                    //             }) 
+                    //         })
+                    //     }
+                    //     else {
+                    //         db.firestore().collection('notifications').doc(uname).set({
+                    //             notiflist: firebase.firestore.FieldValue.arrayUnion({
+                    //                 from : localStorage.getItem('username') , 
+                    //                 action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                    //                 contentname : "collab Invite" ,
+                    //             }) , 
+                    //             token: [],
+                    //         })
+                    //     }
+                    // })
+                    // //notif added 
+
+                    // //send notif to unama (redirect to read Story Page)
+                    // var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.StoryDetails.id  ; 
+                    // var title  = "Collab Invitation" ; 
+                    // var body = props.StoryDetails.creator + " has invited you in collaborating his "+ props.title + "'"+ props.StoryDetails.StoryTitle+"'" ; 
+                    // db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
+                    //     console.log("send tokens to server" , qs.data().token) ; 
+                    //     if(qs.exists){
+                    //         var tokens   =qs.data().token ; 
+                    //         tokens.push(mytoken) ; 
+                    //         sendTokenToServer(tokens , title , body , click_action) ;
+                    //     }
+                    // }).catch(err =>{
+                    //     console.log("Couldn't open the doc"); 
+                    // }) ; 
+                    // //notif sent
+
+                    
                     setSnackMessage("Invited");
                     setSnackColor("success");
                     setSnackbar(true);

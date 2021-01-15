@@ -7,9 +7,10 @@ import * as Atts from '../../Write/Story/Atts';
 import { Redirect, useHistory } from "react-router";
 import db from '../../database/db';
 import * as firebase from 'firebase';
-
+import {sendTokenToServer} from '../../Notifications/client' ; 
 function StoryDetails(props)
 {
+    var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
     var Details = "col-12 col-md-9  Details " ; 
     var shadow = "myshadow" ; 
     var currLoc = window.location.pathname;
@@ -54,6 +55,45 @@ function StoryDetails(props)
                 else{
                     myStoryDetails.collab.forEach(collaborator=>{
                         if(collaborator.username === localStorage.getItem("username") && collaborator.status===false){
+                            // //add notif to db
+                            // db.firestore().collection('notifications').doc(collaborator.username).get().then(qs=>{
+                            //     if(qs.exists){
+                            //         db.firestore().collection('notifications').doc(myStoryDetails.creator).update({
+                            //             notiflist: firebase.firestore.FieldValue.arrayUnion({
+                            //                 from : localStorage.getItem('username') , 
+                            //                 action :window.location.href , 
+                            //                 contentname : "collab accepted" ,
+                            //             }) 
+                            //         })
+                            //     }
+                            //     else {
+                            //         db.firestore().collection('notifications').doc(myStoryDetails.creator).set({
+                            //             notiflist: firebase.firestore.FieldValue.arrayUnion({
+                            //                 from : localStorage.getItem('username') , 
+                            //                 action :window.location.href , 
+                            //                 contentname : "collab accepted" ,
+                            //             }), 
+                            //             token : []
+                            //         })
+                            //     }
+                            // }).catch(err =>{ console.log("Unable to add to db")})
+                            // //added notif to db
+
+                            // //send notif to db 
+                            // var title  = "Accepted your Invitation" ; 
+                            // var body  =  localStorage.getItem('username')+" accepted your Invitation for "+ myStoryDetails.title; 
+                            // var click_action = window.location.href ; 
+                            // db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
+                            //     console.log("send tokens to server" , qs.data().token) ; 
+                            //     if(qs.exists){
+                            //         var tokens   =qs.data().token ; 
+                            //         tokens.push(mytoken) ; 
+                            //         sendTokenToServer(tokens , title , body , click_action) ;
+                            //     }
+                            // }).catch(err =>{
+                            //     console.log("Couldn't open the doc"); 
+                            // }) ; 
+                            // //notif sent
                             setInvite(true);
                         }
                         
@@ -99,13 +139,47 @@ function StoryDetails(props)
             db.firestore().collection("likes").doc(myStoryDetails.myid).update({
                 usernames: firebase.firestore.FieldValue.arrayRemove(localStorage.getItem('username'))
             });
-            
+            //Remove the Notification from the database
+            db.firestore().collection("notifications").doc(myStoryDetails.creator).update({
+                notiflist: firebase.firestore.FieldValue.arrayRemove({
+                    from : localStorage.getItem('username') , 
+                    action :window.location.href , 
+                    contentname : "like" ,
+                }) 
+            });
+            //removed
         }
         else {
             
             db.firestore().collection("likes").doc(myStoryDetails.myid).update({
                 usernames: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem('username'))
             });
+
+            //Add Notification to the dataBase
+            db.firestore().collection("notifications").doc(myStoryDetails.creator).update({
+                notiflist: firebase.firestore.FieldValue.arrayUnion({
+                    from : localStorage.getItem('username') , 
+                    action :window.location.href , 
+                    contentname : "like" ,
+                }) 
+            });
+            //NotificationAdded
+            //pushing Notification
+            var title  = "Liked Your Post" ; 
+            var body  =  localStorage.getItem('username')+" liked your "+ props.title ; 
+            var click_action = window.location.href ; 
+            console.log(click_action , "click the dick ") ;  
+            db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
+                console.log("send tokens to server" , qs.data().token) ; 
+                if(qs.exists){
+                    var tokens   =qs.data().token ; 
+                    tokens.push(mytoken) ; 
+                    sendTokenToServer(tokens , title , body , click_action) ;
+                }
+            }).catch(err =>{
+                console.log("Couldn't open the doc"); 
+            }) ; 
+            //end of Notification
         }
         
         setLikeCommentCount({
@@ -115,7 +189,7 @@ function StoryDetails(props)
         setLikeState(!LikeState) ;
         
     }
-    function handleSubmit(event)
+    function handleCommentSubmit(event)
     {
         event.preventDefault(); 
         console.log("THe event triggerd "); 
@@ -146,6 +220,26 @@ function StoryDetails(props)
                         "ncomments": myStoryDetails.ncomments+1 
                     }
                 );
+                //Add Notification to db 
+                db.firestore().collection('notifications').doc(myStoryDetails.creator).update({
+                    notiflist : firebase.firestore.FieldValue.arrayUnion({
+                        from : localStorage.getItem('username') , 
+                        action : window.location.href , 
+                        contentname : "comment"
+                    })  
+                })
+                //addes notif to db 
+                //sending Notification to sever
+                var notifBody = localStorage.getItem('username') + " Commented on your " + props.title ; 
+                var notifTitle = "Comment" ; 
+                db.firestore().collection('notifications').doc(myStoryDetails.creator).get().then(qs =>{
+                    if (true || qs.data().token){
+                        var tokens   =qs.data().token ; 
+                        tokens.push(mytoken) ; 
+                        sendTokenToServer(tokens,notifTitle,notifBody , window.location.href ) ;
+                    }
+                })
+                //notif sent
                 setLikeCommentCount({
                     ...LikeCommentCount,
                     "comments": LikeCommentCount.comments+ 1 
@@ -389,7 +483,7 @@ function StoryDetails(props)
 
             </div>
             {isExpanded.comments && (<div className="container" style={{marginTop:"20px", }}>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleCommentSubmit}>
                    
                         <textarea
                             name="StoryComment"
@@ -530,7 +624,6 @@ class Comments extends React.Component
         .then(querysnapshot =>{
             if(querysnapshot.exists)
                 this.setState({AllStoryComments :{ comments: querysnapshot.data().comments , id:querysnapshot.id} , stage: 4 } ); 
-                console.log("Hey He Just Called me ") ; 
         }).catch(error =>{
             console.log(error) ;console.log("NO COmmetns"); 
         }) ; 
@@ -612,7 +705,14 @@ class Comments extends React.Component
                                             onClick={()=>{
                                                 db.firestore().collection("comments").doc(this.props.id).update({
                                                     comments: firebase.firestore.FieldValue.arrayRemove(this.state.DeleteComment)
-                                                })
+                                                });
+                                                db.firestore().collection('notifications').doc(this.props.creator).update({
+                                                    notiflist : firebase.firestore.FieldValue.arrayRemove({
+                                                        from : localStorage.getItem('username') , 
+                                                        action : window.location.href , 
+                                                        contentname : "comment"
+                                                    })  
+                                                }) ; 
                                                 db.firestore().collection(Atts.documentName[this.props.title]).doc(this.props.id).update({
                                                     "ncomments" : this.state.AllStoryComments.comments.length -1 
                                                     
@@ -631,7 +731,7 @@ class Comments extends React.Component
                         </div>
                         <div className="container">
                         <h1>All Comments</h1>
-                        {this.state.AllStoryComments.comments.map((eachComment , index)=>{
+                        {this.state.AllStoryComments.comments.reverse().map((eachComment , index)=>{
                             
                             return ( <div className="FitToContent Comment" key= {index}>
                                         <h4 className="FitToContent" style={{color: Atts.getHashClassName(eachComment.user.length)}}>{eachComment.user}</h4>

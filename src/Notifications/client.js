@@ -6,46 +6,71 @@ import Axios from 'axios';
 
 
 const messaging=firebase.messaging();
-
-
 function IntitalizeFireBaseMessaging() {
 
-    
-    messaging.getToken({vapidKey: 'BPI4TcoeyYAB0d8whsM0PMJoAZFeVQeSNwBidPwIGMZnPh7IMuyPkXcsSHTRYATajoMnMF6uTaKimpMd04ElNX4'}).then((currentToken) => {
-        if (currentToken) {
-          console.log(currentToken , "token")  ; 
-          sendTokenToServer(currentToken);
-        } else {
-          console.log('No registration token available. Request permission to generate one.');
+    console.log("Initializing firebase") ; 
+    messaging.requestPermission().then(()=>{
 
-          setTokenSentToServer(false);
-        }
-      }).catch((err) => {
-        console.log('An error occurred while retrieving token. ', err);
-        setTokenSentToServer(false);
-      });
+        messaging.getToken({vapidKey: 'BPI4TcoeyYAB0d8whsM0PMJoAZFeVQeSNwBidPwIGMZnPh7IMuyPkXcsSHTRYATajoMnMF6uTaKimpMd04ElNX4'}).then((currentToken) => {
+            if (currentToken) {
+              console.log(currentToken , "token")  ;
+              //token generated ->add to the database 
+            
+
+            db.firestore().collection('notifications').doc(localStorage.getItem('username')).get().then(qs =>{
+                if(qs.exists)
+                { db.firestore().collection("notifications").doc(localStorage.getItem('username')).update({
+                    token : firebase.firestore.FieldValue.arrayUnion(currentToken) 
+                  }); }
+                else {
+                    db.firestore().collection("notifications").doc(localStorage.getItem('username')).set({
+                        token : firebase.firestore.FieldValue.arrayUnion(currentToken)  , 
+                        notiflist : []
+                      }); 
+                }
+            }).catch(err =>{
+                 console.log("error in adding token to server") ; 
+            })
+
+            //token added
+
+            }
+            else {
+              console.log('No registration token available. Request permission to generate one.');
+    
+              setTokenSentToServer(false);
+            }
+          }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+            setTokenSentToServer(false);
+          });
+
+    }).catch(()=>{console.log("Permission Denied");})
+    
 }
-function sendTokenToServer(token){ 
+function sendTokenToServer(tokens ,title, body , click_action){ 
+    
     if (!isTokensendTokenToServer()) {
-        console.log("keep enought ") ; 
+        console.log("hey Sending Tokens" , tokens) ; 
             const postObject={
-                "registration_ids" : ["d4_LsyR_KDpE3CU1nNQVlT:APA91bE8yYznmwgb1UFKhdc0IriAHh2tuVb5fbcgN9LQgse5Uz2NwmtXrzYrvfJC6wTkXMUHsGuBzmdJBGyK0iTwxrKNQFR1-1MSepWrv7rlLnWLrlxz9LyrvpT1BULw1AyJ3LVV3Rhw" , token ],
+                "registration_ids" : tokens,
                 "priority":"high",
                "notification": {
-                   "title":"Liked Your Post",
-                    "body": "the user "+  localStorage.getItem('username')+" liked your Post",
+                   "title": title,
+                    "body": body,
                     "sound": "default" ,
                     "icon": process.env.PUBLIC_URL + '/myimage.png' , 
-                   "badge": "50"
+                   "badge": "50" ,
+                   "click_action":click_action 
                 }
             }; 
             let config = {
                 headers : {
-                    "Authorization": 'key='+'AAAA1qyN3CQ:APA91bHoBSMgXvVF642CYjspEhWvj9pIxUTmxnRhE4k0T8psOURcKZk9m0JWoyzM1hYlR9RTLQkbDUscgmkwXXzaZB5Vb4FZbLB1QtEggxCnGfoc3XUlTCaMO3l4Hwa9nRnbKjE-prk1',
+                    "Authorization": 'key='+'AAAA1qyN3CQ:APA91bHzkj8vOiAnkqI-jr7W2rQV77xgNsFkZMREtQkXDrauzLhEOcby1Lvh3fdZFNPEbPeJdU9Q7Vif16dSYDKId8Kf4htyccuSm51AT0doxhu1ciQ21-1TzkrCaiBgtofjiVea9JFn',
                     "Content-Type" :'application/json'
                 }
               } ; 
-            Axios.post('https://fcm.googleapis.com/fcm/send', postObject, config).then(response=>{ console.log("heven in the dogs man" , response)}).catch(err=>{
+            Axios.post('https://fcm.googleapis.com/fcm/send', postObject, config).then(response=>{ console.log( response)}).catch(err=>{
                 console.log("Unable to send the request to firebase" , err) ; 
             });
         
@@ -59,12 +84,13 @@ function sendTokenToServer(token){
     }
 
 messaging.onMessage(function (payload) {
+
     console.log(payload);
     const notificationOption={
         body:payload.notification.body,
         icon:payload.notification.icon
     };
-
+    console.log("MEssage REcieved from SErver")
     if(Notification.permission==="granted"){
         var notification=new Notification(payload.notification.title,notificationOption);
 
@@ -79,6 +105,8 @@ messaging.onMessage(function (payload) {
 messaging.onTokenRefresh(function () {
     messaging.getToken()
         .then(function (newtoken) {
+
+            //on New Token generated  -> update to the database
             console.log("New Token : "+ newtoken);
         })
         .catch(function (reason) {
@@ -86,4 +114,5 @@ messaging.onTokenRefresh(function () {
         })
 })
 
-export default IntitalizeFireBaseMessaging ; 
+export default IntitalizeFireBaseMessaging ;
+export {sendTokenToServer} ;  

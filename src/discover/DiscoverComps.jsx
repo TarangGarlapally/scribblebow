@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import Slide from "@material-ui/core/Slide";
 import Avatar from '@material-ui/core/Avatar';
+import { sendTokenToServer } from "../Notifications/client";
 
 const categoryPathName = {
     "stories": "Story",
@@ -26,8 +27,9 @@ const ReadPathName = {
     "Audio": "/audio-content",
     "Script": "/ReadStory"
 };
-
+var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
 export function TopUserTile(myprops) {
+    
     const history = useHistory();
     console.log("hey dude")
     const [fstatus, setFstatus] = useState(myprops.follows.includes(myprops.uobj[1]));
@@ -51,6 +53,20 @@ export function TopUserTile(myprops) {
             db.firestore().collection("followers").doc(myprops.uobj[1]).update({
                 followers: firebase.firestore.FieldValue.arrayRemove(localStorage.getItem('username'))
             });
+            //Remove Notif from db 
+            var CreatorsNotif = db.firestore().collection("notifications").doc(myprops.uobj[1])  ; 
+             CreatorsNotif.get().then(qs =>{
+                 if(qs.exists){
+                     CreatorsNotif.update({
+                         notiflist: firebase.firestore.FieldValue.arrayRemove({
+                             from : localStorage.getItem('username') , 
+                             action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                             contentname : "follow" ,
+                         }) 
+                     });
+                 }
+             });
+            //notif Removed
 
         } else {
 
@@ -71,6 +87,51 @@ export function TopUserTile(myprops) {
             db.firestore().collection("followers").doc(myprops.uobj[1]).update({
                 followers: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem('username'))
             });
+            //Add NOtif to db 
+            db.firestore().collection("notifications").doc(myprops.uobj[1]).get().then(qs =>{
+                if(qs.exists){
+                 db.firestore().collection("notifications").doc(myprops.uobj[1]).update({
+                        notiflist: firebase.firestore.FieldValue.arrayUnion({
+                            from : localStorage.getItem('username') , 
+                            action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                            contentname : "follow" ,
+                        }) 
+                    });
+                }
+                else {
+                 db.firestore().collection("notifications").doc(myprops.uobj[1]).set({
+                   notiflist: firebase.firestore.FieldValue.arrayUnion({
+                       from : localStorage.getItem('username') , 
+                       action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                       contentname : "follow" ,
+                   }), 
+                   token : [] 
+                   }) ; 
+                }
+            }).catch(err =>{
+              console.log("user not found baby") ; 
+            })
+            
+            //notif added 
+
+            //send notif to followed user
+            var title  = "Follower" ;  
+             var body  =  localStorage.getItem('username')+" Started Follwing you" ; 
+             var click_action =window.location.pathname + "?UserId=" + localStorage.getItem("username") ; 
+             db.firestore().collection("notifications").doc(myprops.uobj[1]).get().then(qs=>{
+                     if(qs.exists)
+                     {
+                         var tokens   =qs.data().token ; 
+                         tokens.push(mytoken) ; 
+                         console.log("tokens" ,tokens) ; 
+                         sendTokenToServer(tokens , title , body , click_action) ;
+                     }
+                    
+             }).catch(err =>{
+                 console.log("Couldn't open the doc"); 
+             }) ; 
+
+            //notif sent
         }
         setFstatus(!fstatus);
     }
@@ -256,6 +317,21 @@ function ResultUserTab(myprops) {
                 followers: firebase.firestore.FieldValue.arrayRemove(localStorage.getItem('username'))
             });
 
+            //Remove Notif from db 
+            var CreatorsNotif = db.firestore().collection("notifications").doc(myprops.cobj[1])  ; 
+             CreatorsNotif.get().then(qs =>{
+                 if(qs.exists){
+                     CreatorsNotif.update({
+                         notiflist: firebase.firestore.FieldValue.arrayRemove({
+                             from : localStorage.getItem('username') , 
+                             action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                             contentname : "follow" ,
+                         }) 
+                     });
+                 }
+             });
+            //notif Removed
+            
             setFno(fno - 1);
 
         } else {
@@ -277,6 +353,53 @@ function ResultUserTab(myprops) {
             db.firestore().collection("followers").doc(myprops.cobj[1]).update({
                 followers: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem('username'))
             });
+
+            //Add NOtif to db 
+            db.firestore().collection("notifications").doc(myprops.cobj[1]).get().then(qs =>{
+                if(qs.exists){
+                 db.firestore().collection("notifications").doc(myprops.cobj[1]).update({
+                        notiflist: firebase.firestore.FieldValue.arrayUnion({
+                            from : localStorage.getItem('username') , 
+                            action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                            contentname : "follow" ,
+                        }) 
+                    });
+                }
+                else {
+                 db.firestore().collection("notifications").doc(myprops.cobj[1]).set({
+                   notiflist: firebase.firestore.FieldValue.arrayUnion({
+                       from : localStorage.getItem('username') , 
+                       action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                       contentname : "follow" ,
+                   }), 
+                   token : [] 
+                   }) ; 
+                }
+            }).catch(err =>{
+              console.log("user not found baby") ; 
+            })
+            
+            //notif added 
+
+            //send notif to followed user
+            var title  = "Follower" ;  
+             var body  =  localStorage.getItem('username')+" Started Follwing you" ; 
+             var click_action =window.location.pathname + "?UserId=" + localStorage.getItem("username") ; 
+             db.firestore().collection("notifications").doc(myprops.cobj[1]).get().then(qs=>{
+                     if(qs.exists)
+                     {
+                         var tokens   =qs.data().token ; 
+                         tokens.push(mytoken) ; 
+                         console.log("tokens" ,tokens) ; 
+                         sendTokenToServer(tokens , title , body , click_action) ;
+                     }
+                    
+             }).catch(err =>{
+                 console.log("Couldn't open the doc"); 
+             }) ; 
+
+            //notif sent
+
             setFno(fno + 1);
         }
         setFstatus(!fstatus);
