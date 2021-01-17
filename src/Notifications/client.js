@@ -81,8 +81,8 @@ function sendTokenToServer(tokens ,title, body , click_action){
     }
     function setTokenSentToServer(sent) {
     window.localStorage.setItem('sendTokenToServer', sent ? '1' : '0');
+    
     }
-
 messaging.onMessage(function (payload) {
 
     console.log(payload);
