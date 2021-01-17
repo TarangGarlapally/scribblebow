@@ -5,13 +5,10 @@ import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom
 import { AuthProvider } from './Auth';
 import ScribblePlayer from './AudioUI/ScribblePlayer';
 import PrivateRoute from './PrivateRoute';
-
+import  RequestNotification from './Notifications/client' ; 
 import db from "./database/db";
-import pn  from './Notifications/client' ; 
 
-
-pn() ; 
-
+RequestNotification() ; 
 function App(){
   const [play, setPlay] = useState(false);
   const [data,setData] = useState();

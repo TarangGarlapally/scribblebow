@@ -24,6 +24,7 @@ import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import Button from '@material-ui/core/Button';
 import {EditProfileComp} from "../../Write/Profile/EditProfile";
+import { sendTokenToServer } from '../../Notifications/client';
 //end dialog edit profile
 
 export const UserDetails  = function (props)
@@ -33,7 +34,8 @@ export const UserDetails  = function (props)
         ...props.Details 
         
     }; 
-  
+
+    var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
     console.log(props.IsUserFollowed, "Is UserFollowed") ; 
     const history = useHistory() ; 
     var currentUser = localStorage.getItem('username') ; 
@@ -79,7 +81,7 @@ export const UserDetails  = function (props)
       let val  ; 
       if(FollowButton)
       {
-        //reove the user 
+        //remove the user 
               
             val = - 1 ; 
             db.firestore().collection("follows").doc(localStorage.getItem('username')).update({
@@ -96,11 +98,24 @@ export const UserDetails  = function (props)
           ); 
           db.firestore().collection("users").doc(allprops.id).update({
             "nfollowers": firebase.firestore.FieldValue.increment(val)
-          })
+          }); 
+
+          var CreatorsNotif = db.firestore().collection("notifications").doc(allprops.id)  ; 
+             CreatorsNotif.get().then(qs =>{
+                 if(qs.exists){
+                     CreatorsNotif.update({
+                         notiflist: firebase.firestore.FieldValue.arrayRemove({
+                             from : localStorage.getItem('username') , 
+                             action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                             contentname : "follow" ,
+                         }) 
+                     });
+                 }
+             }); 
       }
       else 
       {
-        //add 
+        //add user
 
                 val = 1 ; 
                 db.firestore().collection("follows").doc(localStorage.getItem('username')).update({
@@ -118,6 +133,50 @@ export const UserDetails  = function (props)
             db.firestore().collection("users").doc(allprops.id).update({
               "nfollowers": firebase.firestore.FieldValue.increment(val)
             })
+
+             //Add Notification to the dataBase
+             db.firestore().collection("notifications").doc(allprops.id).get().then(qs =>{
+                 if(qs.exists){
+                  db.firestore().collection("notifications").doc(allprops.id).update({
+                         notiflist: firebase.firestore.FieldValue.arrayUnion({
+                             from : localStorage.getItem('username') , 
+                             action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                             contentname : "follow" ,
+                         }) 
+                     });
+                 }
+                 else {
+                  db.firestore().collection("notifications").doc(allprops.id).set({
+                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                        from : localStorage.getItem('username') , 
+                        action : window.location.pathname + "?UserId=" + localStorage.getItem("username") , 
+                        contentname : "follow" ,
+                    }), 
+                    token : [] 
+                    }) ; 
+                 }
+             }).catch(err =>{
+               console.log("user not found baby") ; 
+             })
+             
+             //NotificationAdded
+             //pushing Notification
+             var title  = "Follower" ;  
+             var body  =  localStorage.getItem('username')+" Started Follwing you" ; 
+             var click_action =window.location.pathname + "?UserId=" + localStorage.getItem("username") ; 
+             db.firestore().collection("notifications").doc(allprops.id).get().then(qs=>{
+                     if(qs.exists)
+                     {
+                         var tokens   =qs.data().token ; 
+                         tokens.push(mytoken) ; 
+                         console.log("tokens" ,tokens) ; 
+                         sendTokenToServer(tokens , title , body , click_action) ;
+                     }
+                    
+             }).catch(err =>{
+                 console.log("Couldn't open the doc"); 
+             }) ; 
+             //end of Notification
         
       }
       setFollowButton(!FollowButton) ; 

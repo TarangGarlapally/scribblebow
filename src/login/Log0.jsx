@@ -3,6 +3,7 @@ import { AuthContext } from "../Auth";
 import { Username, UserUid } from "../database/funcs";
 import { Redirect, useHistory } from "react-router";
 import Loading from "../components/Loading";
+import IntitalizeFireBaseMessaging from "../Notifications/client";
 
 export default function Log0(){
     const {currentUser} = useContext(AuthContext);
@@ -22,6 +23,7 @@ export default function Log0(){
         
         setTimeout(function(){
             if(localStorage.getItem("emailverif")=="true"){
+                IntitalizeFireBaseMessaging() ; 
                 history.push("/");
             }
             else{

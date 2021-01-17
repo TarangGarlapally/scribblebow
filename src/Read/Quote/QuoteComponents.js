@@ -5,11 +5,13 @@ import * as Atts from '../../Write/Story/Atts' ;
 import db from '../../database/db';
 import * as firebase from 'firebase';
 import { useHistory } from 'react-router';
-
+import { sendTokenToServer } from '../../Notifications/client';
+import { ScrollTo } from "react-scroll-to";
 
 export default function Quote(props)
 {
     
+    var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
     const  QuoteStatus = props.Details  ;  
     console.log(QuoteStatus , "Quote Status" ) ; 
     const history = useHistory() ; 
@@ -20,7 +22,12 @@ export default function Quote(props)
             "comments": QuoteStatus.ncomments,
         }
     );
-    const [AllCommentsDisplay , setAllCommentsDisplay] = useState(false) ; 
+    const [AllCommentsDisplay , setAllCommentsDisplay] = useState(props.AllCommentsDisplay ? true : false) ; 
+    
+    if(props.AllCommentsDisplay){
+        console.log(props.AllCommentsDisplay , "all COmments display " ) ; 
+        window.scrollTo(300  ,500) ; 
+    }
     const [LikeState , setLikeState] = useState(props.preLiked) ; 
     const [ReportStory, setReportStory] = useState({
         message : "" , 
@@ -52,7 +59,7 @@ export default function Quote(props)
 
         setMyShelf(!myShelf) ; 
     }
-    function handleSubmit(event)
+    function handleCommentSubmit(event)
     {
         event.preventDefault(); 
         console.log("THe event triggerd "); 
@@ -72,6 +79,41 @@ export default function Quote(props)
                         "ncomments": QuoteStatus.ncomments+1 
                     }
                 );
+                //adding Notification to db 
+                var CreatorsNotif = db.firestore().collection('notifications').doc(QuoteStatus.creator) ; 
+                CreatorsNotif.get().then(qs =>{
+                    if(qs.exists){
+                        CreatorsNotif.update({
+                            notiflist : firebase.firestore.FieldValue.arrayUnion({
+                                from : localStorage.getItem('username') , 
+                                action : window.location.href , 
+                                contentname : "comment"
+                            })  
+                        }); 
+                    }else {
+                        CreatorsNotif.set({
+                            notiflist : firebase.firestore.FieldValue.arrayUnion({
+                                from : localStorage.getItem('username') , 
+                                action : window.location.href , 
+                                contentname : "comment"
+                            }) , 
+                            token :[]  
+                        }); 
+                    }
+                })
+               
+                //added
+                //sending notif to creator
+                var notifBody = localStorage.getItem('username') + " Commented on your " + props.title ; 
+                var notifTitle = "Comment" ; 
+                db.firestore().collection('notifications').doc(QuoteStatus.creator).get().then(qs =>{
+                    if (true || qs.data().token){
+                        var tokens   =qs.data().token ; 
+                        tokens.push(mytoken) ; 
+                        sendTokenToServer(tokens,notifTitle,notifBody , window.location.href + "&AllCommentsDisplay="+window.pageYOffset ) ;
+                    }
+                }) ; 
+                //notif sent
                 setLikeCommentCount({
                     ...LikeCommentCount,
                     "comments": LikeCommentCount.comments+ 1 
@@ -96,6 +138,18 @@ export default function Quote(props)
             db.firestore().collection("likes").doc(props.QuoteId).update({
                 usernames: firebase.firestore.FieldValue.arrayRemove(localStorage.getItem('username'))
             });
+            var CreatorsNotif = db.firestore().collection("notifications").doc(QuoteStatus.creator)  ; 
+            CreatorsNotif.get().then(qs =>{
+                if(qs.exists){
+                    CreatorsNotif.update({
+                        notiflist: firebase.firestore.FieldValue.arrayRemove({
+                            from : localStorage.getItem('username') , 
+                            action :window.location.href , 
+                            contentname : "like" ,
+                        }) 
+                    });
+                }
+            })
             
         }
         else {
@@ -103,6 +157,47 @@ export default function Quote(props)
             db.firestore().collection("likes").doc(props.QuoteId).update({
                 usernames: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem('username'))
             });
+            //Add Notification to the dataBase
+            var CreatorsNotif = db.firestore().collection("notifications").doc(QuoteStatus.creator)  ; 
+            CreatorsNotif.get().then(qs =>{
+                if(qs.exists){
+                    CreatorsNotif.update({
+                        notiflist: firebase.firestore.FieldValue.arrayUnion({
+                            from : localStorage.getItem('username') , 
+                            action :window.location.href , 
+                            contentname : "like" ,
+                        }) 
+                    });
+                }
+                else {
+                    CreatorsNotif.set({
+                        notiflist: firebase.firestore.FieldValue.arrayUnion({
+                            from : localStorage.getItem('username') , 
+                            action :window.location.href , 
+                            contentname : "like" ,
+                        }) , 
+                        token : [] 
+                    });
+                }
+            })
+            
+            //NotificationAdded
+            //pushing Notification
+            var title  = "Liked Your "+ props.title ; 
+            var body  =  localStorage.getItem('username')+" liked your "+ props.title ; 
+            var click_action = window.location.href ;  
+            db.firestore().collection("notifications").doc(QuoteStatus.creator).get().then(qs=>{
+                    if(qs.exists)
+                    {
+                        var tokens   =qs.data().token ; 
+                        tokens.push(mytoken) ; 
+                        sendTokenToServer(tokens , title , body , click_action) ;
+                    }
+                   
+            }).catch(err =>{
+                console.log("Couldn't open the doc"); 
+            }) ; 
+            //end of Notification
         }
         
         setLikeCommentCount({
@@ -127,7 +222,7 @@ export default function Quote(props)
             cid: props.QuoteId  , 
             message: ReportStory.message
         }
-
+    
         db.firestore().collection("content_reports").doc().set(temp) ; 
 
     }
@@ -243,14 +338,14 @@ export default function Quote(props)
            <h4 align="center" style={{position:"absolute",left:0,right:0,margin:"auto",marginTop:"160px"}}>{QuoteStatus.title}</h4>
            <i className="fa fa-play pointer" onClick={PlayIt} style={{fontSize: "24px",color:"grey"}}></i>
            <p align="center" style={{position:"absolute",left:0,right:0,margin:"auto",marginTop:"180px",color:"grey"}}>{QuoteStatus.description}</p>
-           <p align="center" style={{position:"absolute",left:0,right:0,margin:"auto",bottom:"20px"}} onClick={()=> history.push({
+           <p className = "handy" align="center" style={{position:"absolute",left:0,right:0,margin:"auto",bottom:"20px"}} >{QuoteStatus.creator}</p>
+           </div>
+           }
+           {props.title==="Quote"? <div className = "container-inner handy" style= {{display:"flex" , justifyContent:"flex-end"}} onClick={()=> history.push({
             pathname: '/Profile',
             search: '?UserId=' + QuoteStatus.creator,
             state: { id: QuoteStatus.creator },
-        })}>{QuoteStatus.creator}</p>
-           </div>
-           }
-           {props.title==="Quote"? <div className = "container-inner" style= {{display:"flex" , justifyContent:"flex-end"}}><h4>-{QuoteStatus.creator}</h4></div>:null}
+        })}><h4>-{QuoteStatus.creator}</h4></div>:null}
             <hr></hr>
             <div className= ""  style = {{display: "flex", justifyContent:"space-evenly"}}>
                  <div className = "box"  style={{color: LikeState?"#E61D42":null }} onClick ={handleLikeButton}><icons.MdFavorite size = "40" /><Caption caption = {LikeCommentCount.likes} /> </div>
@@ -262,7 +357,7 @@ export default function Quote(props)
             </div>
             <div id ="Comment Section">
                 <h3>Comments:</h3>
-                <form onSubmit = {handleSubmit}>
+                <form onSubmit = {handleCommentSubmit}>
                 <textarea
                             name="QuoteComment"
                             rows="1"
@@ -277,7 +372,8 @@ export default function Quote(props)
                 </form>
                 <a className= "handy" onClick = {()=>{ setAllCommentsDisplay(!AllCommentsDisplay)}}>All Comments ({LikeCommentCount.comments} ) </a>
                 <div id= "AllComments" style={{ display : AllCommentsDisplay ? "": "none"}} >
-                    <AllComments id = {props.QuoteId}  title = {props.title} ncomments  = {LikeCommentCount.comments}
+                    <AllComments id = {props.QuoteId}  title = {props.title} ncomments  = {LikeCommentCount.comments} 
+                    creator = {QuoteStatus.creator}
                     setCommentFunction = {setLikeCommentCount} nlikes = {LikeCommentCount.likes} key = {Math.random()} />
                 </div>
                       
@@ -399,13 +495,20 @@ class AllComments  extends React.Component
                                         onClick={()=>{
                                             db.firestore().collection("comments").doc(this.props.id).update({
                                                 comments: firebase.firestore.FieldValue.arrayRemove(this.state.DeleteComment)
-                                            })
-                                            db.firestore().collection(Atts.documentName[this.props.title]).doc(this.props.id).update({
-                                                "ncomments" : this.props.ncomments -1 
-                                                
                                             }).then( qs =>{
                                                 this.setState({stage:0}) ; 
                                             }) 
+                                            db.firestore().collection(Atts.documentName[this.props.title]).doc(this.props.id).update({
+                                                "ncomments" : this.props.ncomments -1 
+                                                
+                                            })
+                                            db.firestore().collection('notifications').doc(this.props.creator).update({
+                                                    notiflist : firebase.firestore.FieldValue.arrayRemove({
+                                                        from : localStorage.getItem('username') , 
+                                                        action : window.location.href , 
+                                                        contentname : "comment"
+                                                    })  
+                                                }) ; 
                                             this.props.setCommentFunction(prevals =>{
                                                 return {
                                                     ...prevals ,

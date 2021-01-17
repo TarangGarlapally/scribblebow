@@ -87,6 +87,7 @@ export default class ReadQuote extends React.Component
             return <Redirect to={"/Log0"} />;
         }
         const title = new URLSearchParams(this.props.location.search).get("title");
+        const AllCommentsDisplay = new URLSearchParams(this.props.location.search).get("AllCommentsDisplay") ; 
         var allProps = {
             "title": title, 
             "id": title==="Quote"?new URLSearchParams(this.props.location.search).get("QuoteId"):new URLSearchParams(this.props.location.search).get("StoryId"),
@@ -112,6 +113,7 @@ export default class ReadQuote extends React.Component
                     preLiked  = {this.state.preLiked}
                     myshelf = {this.state.myshelf}
                     setPlayAudio = {this.props.setPlayAudio}
+                    AllCommentsDisplay = {AllCommentsDisplay}
                 />
                 </div>
                
