@@ -4,9 +4,7 @@ import Axios from 'axios';
 
 
 
-
 const messaging=firebase.messaging();
-
 
 function IntitalizeFireBaseMessaging() {
 

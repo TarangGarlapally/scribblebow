@@ -9,7 +9,9 @@ import PrivateRoute from './PrivateRoute';
 import db from "./database/db";
 import pn  from './Notifications/client' ; 
 
+
 pn() ; 
+
 function App(){
   const [play, setPlay] = useState(false);
   const [data,setData] = useState();
