@@ -154,21 +154,23 @@ function StoryDetails(props)
             db.firestore().collection("likes").doc(myStoryDetails.myid).update({
                 usernames: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem('username'))
             });
-
+           
             //Add Notification to the dataBase
             db.firestore().collection("notifications").doc(myStoryDetails.creator).update({
                 notiflist: firebase.firestore.FieldValue.arrayUnion({
                     from : localStorage.getItem('username') , 
                     action :window.location.href , 
                     contentname : "like" ,
-                }) 
+                })
+            }).catch(err=>{
+                console.log(err);
             });
             //NotificationAdded
             //pushing Notification
             var title  = "Liked Your Post" ; 
             var body  =  localStorage.getItem('username')+" liked your "+ props.title ; 
             var click_action = window.location.href ; 
-            console.log(click_action , "click the dick ") ;  
+            console.log(click_action , "click the  ") ;  
             db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
                 console.log("send tokens to server" , qs.data().token) ; 
                 if(qs.exists){

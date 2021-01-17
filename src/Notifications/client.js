@@ -17,6 +17,7 @@ function IntitalizeFireBaseMessaging() {
             
 
             db.firestore().collection('notifications').doc(localStorage.getItem('username')).get().then(qs =>{
+               
                 if(qs.exists)
                 { db.firestore().collection("notifications").doc(localStorage.getItem('username')).update({
                     token : firebase.firestore.FieldValue.arrayUnion(currentToken) 
