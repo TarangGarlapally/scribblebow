@@ -10,7 +10,7 @@ import * as firebase from 'firebase';
 import {sendTokenToServer} from '../../Notifications/client' ; 
 function StoryDetails(props)
 {
-    var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
+    
     var Details = "col-12 col-md-9  Details " ; 
     var shadow = "myshadow" ; 
     var currLoc = window.location.pathname;
@@ -174,8 +174,7 @@ function StoryDetails(props)
             db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
                 console.log("send tokens to server" , qs.data().token) ; 
                 if(qs.exists){
-                    var tokens   =qs.data().token ; 
-                    tokens.push(mytoken) ; 
+                    var tokens   =qs.data().token ;  
                     sendTokenToServer(tokens , title , body , click_action) ;
                 }
             }).catch(err =>{
@@ -237,7 +236,6 @@ function StoryDetails(props)
                 db.firestore().collection('notifications').doc(myStoryDetails.creator).get().then(qs =>{
                     if (true || qs.data().token){
                         var tokens   =qs.data().token ; 
-                        tokens.push(mytoken) ; 
                         sendTokenToServer(tokens,notifTitle,notifBody , window.location.href ) ;
                     }
                 })

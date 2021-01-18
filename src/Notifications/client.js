@@ -52,6 +52,8 @@ function sendTokenToServer(tokens ,title, body , click_action){
     
     if (!isTokensendTokenToServer()) {
         console.log("hey Sending Tokens" , tokens) ; 
+        var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
+            tokens.push(mytoken) ; 
             const postObject={
                 "registration_ids" : tokens,
                 "priority":"high",
