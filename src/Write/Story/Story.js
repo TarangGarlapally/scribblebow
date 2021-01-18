@@ -405,7 +405,7 @@ function WriteStory(props)
             if(collaborator.status===true){
                 return <div>
                             <p className="col-12 col-sm-9">{collaborator.username}</p>
-                            <p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#bb2124"}}></i></p>
+                            {props.StoryDetails.creator==localStorage.getItem("username")?<p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#bb2124"}}></i></p>:null}
                         </div>
             }else{
                 return null;
@@ -423,7 +423,7 @@ function WriteStory(props)
             if(collaborator.status===false){
                 return <div>
                             <p className="col-12 col-sm-9">{collaborator.username}</p>
-                            <p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#f0ad4e"}}></i></p>
+                            {props.StoryDetails.creator==localStorage.getItem("username")?<p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#f0ad4e"}}></i></p>:null}
                         </div>
             }else{
                 return null;
@@ -503,7 +503,7 @@ function WriteStory(props)
                             
                         </div>
                         <div className="col-12 col-md-2">
-                        <input type="button" className = "btn btn-default mybtn" data-toggle="modal" data-target="#CollabModal" value="Add a Collaborator"></input>
+                        {props.StoryDetails.creator==localStorage.getItem("username")?<input type="button" className = "btn btn-default mybtn" data-toggle="modal" data-target="#CollabModal" value="Add a Collaborator"></input>:null}
                         <br />
                         <h4 style={{marginLeft:"10px"}}><b>Collaborators</b></h4>
                         {
