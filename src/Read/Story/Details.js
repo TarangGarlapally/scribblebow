@@ -10,7 +10,7 @@ import * as firebase from 'firebase';
 import {sendTokenToServer} from '../../Notifications/client' ; 
 function StoryDetails(props)
 {
-    var mytoken  = "caAhyh1M_fi2QJ2SjdvOMW:APA91bE4pECXVafTqbHn6nWIev2ObLPK7H_M6M_zQmVkhSutuVj3AAXDyWZ7uaz-86MdmpfRpRUaglw5Si4ELJjomqLtFzrngR5GKBx817Jnd9kfhg1K9rL3dD-Dm5mn7xjsUyyZbuca" ; 
+    
     var Details = "col-12 col-md-9  Details " ; 
     var shadow = "myshadow" ; 
     var currLoc = window.location.pathname;
@@ -55,45 +55,7 @@ function StoryDetails(props)
                 else{
                     myStoryDetails.collab.forEach(collaborator=>{
                         if(collaborator.username === localStorage.getItem("username") && collaborator.status===false){
-                            // //add notif to db
-                            // db.firestore().collection('notifications').doc(collaborator.username).get().then(qs=>{
-                            //     if(qs.exists){
-                            //         db.firestore().collection('notifications').doc(myStoryDetails.creator).update({
-                            //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                            //                 from : localStorage.getItem('username') , 
-                            //                 action :window.location.href , 
-                            //                 contentname : "collab accepted" ,
-                            //             }) 
-                            //         })
-                            //     }
-                            //     else {
-                            //         db.firestore().collection('notifications').doc(myStoryDetails.creator).set({
-                            //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                            //                 from : localStorage.getItem('username') , 
-                            //                 action :window.location.href , 
-                            //                 contentname : "collab accepted" ,
-                            //             }), 
-                            //             token : []
-                            //         })
-                            //     }
-                            // }).catch(err =>{ console.log("Unable to add to db")})
-                            // //added notif to db
-
-                            // //send notif to db 
-                            // var title  = "Accepted your Invitation" ; 
-                            // var body  =  localStorage.getItem('username')+" accepted your Invitation for "+ myStoryDetails.title; 
-                            // var click_action = window.location.href ; 
-                            // db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
-                            //     console.log("send tokens to server" , qs.data().token) ; 
-                            //     if(qs.exists){
-                            //         var tokens   =qs.data().token ; 
-                            //         tokens.push(mytoken) ; 
-                            //         sendTokenToServer(tokens , title , body , click_action) ;
-                            //     }
-                            // }).catch(err =>{
-                            //     console.log("Couldn't open the doc"); 
-                            // }) ; 
-                            // //notif sent
+                            
                             setInvite(true);
                         }
                         
@@ -174,8 +136,7 @@ function StoryDetails(props)
             db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
                 console.log("send tokens to server" , qs.data().token) ; 
                 if(qs.exists){
-                    var tokens   =qs.data().token ; 
-                    tokens.push(mytoken) ; 
+                    var tokens   =qs.data().token ;  
                     sendTokenToServer(tokens , title , body , click_action) ;
                 }
             }).catch(err =>{
@@ -237,7 +198,6 @@ function StoryDetails(props)
                 db.firestore().collection('notifications').doc(myStoryDetails.creator).get().then(qs =>{
                     if (true || qs.data().token){
                         var tokens   =qs.data().token ; 
-                        tokens.push(mytoken) ; 
                         sendTokenToServer(tokens,notifTitle,notifBody , window.location.href ) ;
                     }
                 })
@@ -524,7 +484,7 @@ function StoryDetails(props)
                 </div>
                 
             {invite===true?
-            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id}/>
+            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id} creator= {props.myStoryDetails.creator} />
             :null
             }
         </div>
@@ -540,9 +500,19 @@ function AcceptInvite(props){
         }).then((err)=>{
             window.location.reload(false);
         });
+        //collab rejected remove from the collabs notifs
+        var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.id  ; 
+        db.firestore().collection("notifications").doc(localStorage.getItem("username")).update({
+            notiflist: firebase.firestore.FieldValue.arrayRemove({
+                from : props.creator , 
+                action :click_action , 
+                contentname : "collab invite" ,
+            }) 
+        })
     }
 
     function acceptReq(){
+        var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.id  ; 
         db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
             collab: firebase.firestore.FieldValue.arrayRemove({username: localStorage.getItem("username"),status:false})
         }).then(err=>{
@@ -551,7 +521,46 @@ function AcceptInvite(props){
             }).then(err=>{
                 window.location.reload(false);
             });
-        })
+        }) ; 
+
+        //add notif to db (collab accepted)
+        db.firestore().collection('notifications').doc(props.creator).get().then(qs=>{
+            if(qs.exists){
+                db.firestore().collection('notifications').doc(props.creator).update({
+                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                        from : localStorage.getItem('username') , 
+                        action :click_action , 
+                        contentname : "collab accept" ,
+                    }) 
+                })
+            }
+            else {
+                db.firestore().collection('notifications').doc(props.creator).set({
+                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                        from : localStorage.getItem('username') , 
+                        action :click_action , 
+                        contentname : "collab accept" ,
+                    }), 
+                    token : []
+                })
+            }
+        }).catch(err =>{ console.log("Unable to add to db")})
+        //added notif to db
+
+        //send notif to db 
+        var title  = "Accepted your Invitation" ; 
+        var body  =  localStorage.getItem('username')+" accepted your Invitation for "+ props.title; 
+        var click_action = window.location.href ; 
+        db.firestore().collection("notifications").doc(props.creator).get().then(qs=>{
+            console.log("send tokens to server" , qs.data().token) ; 
+            if(qs.exists){  
+                var tokens   =qs.data().token ; 
+                sendTokenToServer(tokens , title , body , click_action) ;
+            }
+        }).catch(err =>{
+            console.log("Couldn't open the doc"); 
+        }) ; 
+        //notif sent
     }
 
     return <div className="col-12 myshadow" style={{position:"absolute",bottom:"20px",right:"40px",borderRadius:"4%",zIndex:"200",width:"300px",height:"200px",backgroundColor:"white"}}>

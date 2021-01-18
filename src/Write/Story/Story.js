@@ -88,45 +88,45 @@ function WriteStory(props)
                     else{
                         props.StoryDetails.collab.push({username: uname, status: false})
                     }
-                    // //add notif to uname db
-                    // db.firestore().collection('notifications').doc(uname).get().then(qs=>{
-                    //     if(qs.exists){
-                    //         db.firestore().collection('notifications').doc(uname).update({
-                    //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                    //                 from : localStorage.getItem('username') , 
-                    //                 action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
-                    //                 contentname : "collab Invite" ,
-                    //             }) 
-                    //         })
-                    //     }
-                    //     else {
-                    //         db.firestore().collection('notifications').doc(uname).set({
-                    //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                    //                 from : localStorage.getItem('username') , 
-                    //                 action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
-                    //                 contentname : "collab Invite" ,
-                    //             }) , 
-                    //             token: [],
-                    //         })
-                    //     }
-                    // })
-                    // //notif added 
+                    //add notif to uname db
+                    db.firestore().collection('notifications').doc(uname).get().then(qs=>{
+                        if(qs.exists){
+                            db.firestore().collection('notifications').doc(uname).update({
+                                notiflist: firebase.firestore.FieldValue.arrayUnion({
+                                    from : localStorage.getItem('username') , 
+                                    action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                                    contentname : "collab invite" ,
+                                }) 
+                            })
+                        }
+                        else {
+                            db.firestore().collection('notifications').doc(uname).set({
+                                notiflist: firebase.firestore.FieldValue.arrayUnion({
+                                    from : localStorage.getItem('username') , 
+                                    action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                                    contentname : "collab invite" ,
+                                }) , 
+                                token: [],
+                            })
+                        }
+                    })
+                    //notif added 
 
-                    // //send notif to unama (redirect to read Story Page)
-                    // var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.StoryDetails.id  ; 
-                    // var title  = "Collab Invitation" ; 
-                    // var body = props.StoryDetails.creator + " has invited you in collaborating his "+ props.title + "'"+ props.StoryDetails.StoryTitle+"'" ; 
-                    // db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
-                    //     console.log("send tokens to server" , qs.data().token) ; 
-                    //     if(qs.exists){
-                    //         var tokens   =qs.data().token ; 
-                    //         tokens.push(mytoken) ; 
-                    //         sendTokenToServer(tokens , title , body , click_action) ;
-                    //     }
-                    // }).catch(err =>{
-                    //     console.log("Couldn't open the doc"); 
-                    // }) ; 
-                    // //notif sent
+                    //send notif to unama (redirect to read Story Page)
+                    var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.StoryDetails.id  ; 
+                    var title  = "Collab Invite" ; 
+                    var body = props.StoryDetails.creator + " has invited you in collaborating his "+ props.title + "'"+ props.StoryDetails.StoryTitle+"'" ; 
+                    db.firestore().collection("notifications").doc(uname).get().then(qs=>{
+                        console.log("send tokens to server" , qs.data().token) ; 
+                        if(qs.exists){
+                            var tokens   =qs.data().token ; 
+                            //tokens.push(mytoken) ; 
+                            sendTokenToServer(tokens , title , body , click_action) ;
+                        }
+                    }).catch(err =>{
+                        console.log("Couldn't open the doc"); 
+                    }) ; 
+                    //notif sent
 
                     
                     setSnackMessage("Invited");
@@ -195,13 +195,35 @@ function WriteStory(props)
                 if(props.StoryDetails.collab.length===0){
                     props.StoryDetails.collab = "";
                 }
-                
+                //remove notif from the db
+                db.firestore().collection("notifications").doc(uname).update({
+                    notiflist: firebase.firestore.FieldValue.arrayRemove({
+                        from :  props.StoryDetails.creator, 
+                        action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                        contentname : "collab invite" ,
+                    }) 
+                })
+                //notif removed from db
+
+                    if(status == true){
+                        //accept notif is in only creators db
+                        //remove the accept notif from creators db
+                        db.firestore().collection('notifications').doc(props.StoryDetails.creator).update({
+                            notiflist: firebase.firestore.FieldValue.arrayUnion({
+                                from : localStorage.getItem('username') , 
+                                action: '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id , 
+                                contentname : "collab accept" ,
+                            }) 
+                        })
+                        
+                    }
                 setSnackMessage("Successfully removed the collaborator. Refresh to see changes.");
                 setSnackColor("success");
                 setSnackbar(true);
                 setTimeout(()=>{setSnackbar(false)},5000);
+
                 
-            }
+                }
         })
     }
 
