@@ -88,29 +88,29 @@ function WriteStory(props)
                     else{
                         props.StoryDetails.collab.push({username: uname, status: false})
                     }
-                    // //add notif to uname db
-                    // db.firestore().collection('notifications').doc(uname).get().then(qs=>{
-                    //     if(qs.exists){
-                    //         db.firestore().collection('notifications').doc(uname).update({
-                    //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                    //                 from : localStorage.getItem('username') , 
-                    //                 action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
-                    //                 contentname : "collab Invite" ,
-                    //             }) 
-                    //         })
-                    //     }
-                    //     else {
-                    //         db.firestore().collection('notifications').doc(uname).set({
-                    //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                    //                 from : localStorage.getItem('username') , 
-                    //                 action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
-                    //                 contentname : "collab Invite" ,
-                    //             }) , 
-                    //             token: [],
-                    //         })
-                    //     }
-                    // })
-                    // //notif added 
+                    //add notif to uname db
+                    db.firestore().collection('notifications').doc(uname).get().then(qs=>{
+                        if(qs.exists){
+                            db.firestore().collection('notifications').doc(uname).update({
+                                notiflist: firebase.firestore.FieldValue.arrayUnion({
+                                    from : localStorage.getItem('username') , 
+                                    action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                                    contentname : "collab invite" ,
+                                }) 
+                            })
+                        }
+                        else {
+                            db.firestore().collection('notifications').doc(uname).set({
+                                notiflist: firebase.firestore.FieldValue.arrayUnion({
+                                    from : localStorage.getItem('username') , 
+                                    action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                                    contentname : "collab invite" ,
+                                }) , 
+                                token: [],
+                            })
+                        }
+                    })
+                    //notif added 
 
                     //send notif to unama (redirect to read Story Page)
                     var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.StoryDetails.id  ; 
@@ -200,8 +200,30 @@ function WriteStory(props)
                 setSnackColor("success");
                 setSnackbar(true);
                 setTimeout(()=>{setSnackbar(false)},5000);
-                
-            }
+
+                //remove notif from the db
+                db.firestore().collection("notifications").doc(uname).update({
+                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                        from :  props.StoryDetails.creator, 
+                        action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
+                        contentname : "collab invite" ,
+                    }) 
+                })
+                //notif removed from db
+
+                    if(status == true){
+                        //accept notif is in only creators db
+                        //remove the accept notif from creators db
+                        db.firestore().collection('notifications').doc(props.StoryDetails.creator).update({
+                            notiflist: firebase.firestore.FieldValue.arrayUnion({
+                                from : localStorage.getItem('username') , 
+                                action :window.location.href , 
+                                contentname : "collab accept" ,
+                            }) 
+                        })
+                        
+                    }
+                }
         })
     }
 

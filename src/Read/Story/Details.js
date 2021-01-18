@@ -55,45 +55,7 @@ function StoryDetails(props)
                 else{
                     myStoryDetails.collab.forEach(collaborator=>{
                         if(collaborator.username === localStorage.getItem("username") && collaborator.status===false){
-                            // //add notif to db
-                            // db.firestore().collection('notifications').doc(collaborator.username).get().then(qs=>{
-                            //     if(qs.exists){
-                            //         db.firestore().collection('notifications').doc(myStoryDetails.creator).update({
-                            //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                            //                 from : localStorage.getItem('username') , 
-                            //                 action :window.location.href , 
-                            //                 contentname : "collab accepted" ,
-                            //             }) 
-                            //         })
-                            //     }
-                            //     else {
-                            //         db.firestore().collection('notifications').doc(myStoryDetails.creator).set({
-                            //             notiflist: firebase.firestore.FieldValue.arrayUnion({
-                            //                 from : localStorage.getItem('username') , 
-                            //                 action :window.location.href , 
-                            //                 contentname : "collab accepted" ,
-                            //             }), 
-                            //             token : []
-                            //         })
-                            //     }
-                            // }).catch(err =>{ console.log("Unable to add to db")})
-                            // //added notif to db
-
-                            // //send notif to db 
-                            // var title  = "Accepted your Invitation" ; 
-                            // var body  =  localStorage.getItem('username')+" accepted your Invitation for "+ myStoryDetails.title; 
-                            // var click_action = window.location.href ; 
-                            // db.firestore().collection("notifications").doc(myStoryDetails.creator).get().then(qs=>{
-                            //     console.log("send tokens to server" , qs.data().token) ; 
-                            //     if(qs.exists){
-                            //         var tokens   =qs.data().token ; 
-                            //         tokens.push(mytoken) ; 
-                            //         sendTokenToServer(tokens , title , body , click_action) ;
-                            //     }
-                            // }).catch(err =>{
-                            //     console.log("Couldn't open the doc"); 
-                            // }) ; 
-                            // //notif sent
+                            
                             setInvite(true);
                         }
                         
@@ -522,7 +484,7 @@ function StoryDetails(props)
                 </div>
                 
             {invite===true?
-            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id}/>
+            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id} creator= {props.myStoryDetails.creator} />
             :null
             }
         </div>
@@ -538,6 +500,14 @@ function AcceptInvite(props){
         }).then((err)=>{
             window.location.reload(false);
         });
+        //collab rejected remove from the collabs notifs
+        db.firestore().collection("notifications").doc(localStorage.getItem("username")).update({
+            notiflist: firebase.firestore.FieldValue.arrayRemove({
+                from : props.creator , 
+                action :window.location.href , 
+                contentname : "collab invite" ,
+            }) 
+        })
     }
 
     function acceptReq(){
@@ -549,7 +519,46 @@ function AcceptInvite(props){
             }).then(err=>{
                 window.location.reload(false);
             });
-        })
+        }) ; 
+
+        //add notif to db (collab accepted)
+        db.firestore().collection('notifications').doc(props.creator).get().then(qs=>{
+            if(qs.exists){
+                db.firestore().collection('notifications').doc(props.creator).update({
+                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                        from : localStorage.getItem('username') , 
+                        action :window.location.href , 
+                        contentname : "collab accept" ,
+                    }) 
+                })
+            }
+            else {
+                db.firestore().collection('notifications').doc(props.creator).set({
+                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                        from : localStorage.getItem('username') , 
+                        action :window.location.href , 
+                        contentname : "collab accept" ,
+                    }), 
+                    token : []
+                })
+            }
+        }).catch(err =>{ console.log("Unable to add to db")})
+        //added notif to db
+
+        //send notif to db 
+        var title  = "Accepted your Invitation" ; 
+        var body  =  localStorage.getItem('username')+" accepted your Invitation for "+ props.title; 
+        var click_action = window.location.href ; 
+        db.firestore().collection("notifications").doc(props.creator).get().then(qs=>{
+            console.log("send tokens to server" , qs.data().token) ; 
+            if(qs.exists){  
+                var tokens   =qs.data().token ; 
+                sendTokenToServer(tokens , title , body , click_action) ;
+            }
+        }).catch(err =>{
+            console.log("Couldn't open the doc"); 
+        }) ; 
+        //notif sent
     }
 
     return <div className="col-12 myshadow" style={{position:"absolute",bottom:"20px",right:"40px",borderRadius:"4%",zIndex:"200",width:"300px",height:"200px",backgroundColor:"white"}}>
