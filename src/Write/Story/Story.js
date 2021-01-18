@@ -180,10 +180,10 @@ function WriteStory(props)
     }
 
 
-    function delCollab(uname,index){
+    function delCollab(uname,status, index){
         
         db.firestore().collection(Atts.documentName[props.title]).doc(props.StoryDetails.id).update({
-            collab: firebase.firestore.FieldValue.arrayRemove({username: uname, status: true})
+            collab: firebase.firestore.FieldValue.arrayRemove({username: uname, status: status})
         }).then((error)=>{
             if(error){
                 setSnackMessage("Could not remove the collaborator!");
@@ -405,7 +405,25 @@ function WriteStory(props)
             if(collaborator.status===true){
                 return <div>
                             <p className="col-12 col-sm-9">{collaborator.username}</p>
-                            <p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,index)}><i class="fas fa-times-circle"></i></p>
+                            <p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#bb2124"}}></i></p>
+                        </div>
+            }else{
+                return null;
+            }
+        });
+    }else{
+            return null;
+                            
+    }
+    }
+
+    function PendingCollabTiles(myprops){
+        if(props.StoryDetails.collab !== ""){
+        return  props.StoryDetails.collab.map((collaborator,index)=>{
+            if(collaborator.status===false){
+                return <div>
+                            <p className="col-12 col-sm-9">{collaborator.username}</p>
+                            <p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#f0ad4e"}}></i></p>
                         </div>
             }else{
                 return null;
@@ -490,6 +508,13 @@ function WriteStory(props)
                         <h4 style={{marginLeft:"10px"}}><b>Collaborators</b></h4>
                         {
                             <CollabTiles />
+                        }
+                        <br />
+                        <br />
+                        <br />
+                        <h4 style={{marginLeft:"10px"}}><b>Pending</b></h4>
+                        {
+                            <PendingCollabTiles />
                         }
                         
                         </div>
