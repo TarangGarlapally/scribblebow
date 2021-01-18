@@ -195,15 +195,9 @@ function WriteStory(props)
                 if(props.StoryDetails.collab.length===0){
                     props.StoryDetails.collab = "";
                 }
-                
-                setSnackMessage("Successfully removed the collaborator. Refresh to see changes.");
-                setSnackColor("success");
-                setSnackbar(true);
-                setTimeout(()=>{setSnackbar(false)},5000);
-
                 //remove notif from the db
                 db.firestore().collection("notifications").doc(uname).update({
-                    notiflist: firebase.firestore.FieldValue.arrayUnion({
+                    notiflist: firebase.firestore.FieldValue.arrayRemove({
                         from :  props.StoryDetails.creator, 
                         action : '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id, 
                         contentname : "collab invite" ,
@@ -217,12 +211,18 @@ function WriteStory(props)
                         db.firestore().collection('notifications').doc(props.StoryDetails.creator).update({
                             notiflist: firebase.firestore.FieldValue.arrayUnion({
                                 from : localStorage.getItem('username') , 
-                                action :window.location.href , 
+                                action: '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id , 
                                 contentname : "collab accept" ,
                             }) 
                         })
                         
                     }
+                setSnackMessage("Successfully removed the collaborator. Refresh to see changes.");
+                setSnackColor("success");
+                setSnackbar(true);
+                setTimeout(()=>{setSnackbar(false)},5000);
+
+                
                 }
         })
     }

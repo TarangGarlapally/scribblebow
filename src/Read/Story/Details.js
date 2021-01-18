@@ -501,16 +501,18 @@ function AcceptInvite(props){
             window.location.reload(false);
         });
         //collab rejected remove from the collabs notifs
+        var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.id  ; 
         db.firestore().collection("notifications").doc(localStorage.getItem("username")).update({
             notiflist: firebase.firestore.FieldValue.arrayRemove({
                 from : props.creator , 
-                action :window.location.href , 
+                action :click_action , 
                 contentname : "collab invite" ,
             }) 
         })
     }
 
     function acceptReq(){
+        var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.id  ; 
         db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
             collab: firebase.firestore.FieldValue.arrayRemove({username: localStorage.getItem("username"),status:false})
         }).then(err=>{
@@ -527,7 +529,7 @@ function AcceptInvite(props){
                 db.firestore().collection('notifications').doc(props.creator).update({
                     notiflist: firebase.firestore.FieldValue.arrayUnion({
                         from : localStorage.getItem('username') , 
-                        action :window.location.href , 
+                        action :click_action , 
                         contentname : "collab accept" ,
                     }) 
                 })
@@ -536,7 +538,7 @@ function AcceptInvite(props){
                 db.firestore().collection('notifications').doc(props.creator).set({
                     notiflist: firebase.firestore.FieldValue.arrayUnion({
                         from : localStorage.getItem('username') , 
-                        action :window.location.href , 
+                        action :click_action , 
                         contentname : "collab accept" ,
                     }), 
                     token : []
