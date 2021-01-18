@@ -513,6 +513,7 @@ function AcceptInvite(props){
 
     function acceptReq(){
          
+
         db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
             collab: firebase.firestore.FieldValue.arrayRemove({username: localStorage.getItem("username"),status:false})
         }).then(err=>{
@@ -529,7 +530,7 @@ function AcceptInvite(props){
                 db.firestore().collection('notifications').doc(props.creator).update({
                     notiflist: firebase.firestore.FieldValue.arrayUnion({
                         from : localStorage.getItem('username') , 
-                        action :"/ReadStory?title="+props.title + "&StoryId="+props.id , 
+                        action :"/ReadStory?title="+props.title + "&StoryId="+props.id, 
                         contentname : "collab accept" ,
                     }) 
                 })
@@ -538,7 +539,7 @@ function AcceptInvite(props){
                 db.firestore().collection('notifications').doc(props.creator).set({
                     notiflist: firebase.firestore.FieldValue.arrayUnion({
                         from : localStorage.getItem('username') , 
-                        action :click_action , 
+                        action :"/ReadStory?title="+props.title + "&StoryId="+props.id , 
                         contentname : "collab accept" ,
                     }), 
                     token : []
