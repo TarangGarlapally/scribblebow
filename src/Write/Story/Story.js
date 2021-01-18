@@ -422,10 +422,13 @@ function WriteStory(props)
     } 
 
     function CollabTiles(myprops){
+    	var cnt = 0;
         if(props.StoryDetails.collab !== ""){
         return  props.StoryDetails.collab.map((collaborator,index)=>{
             if(collaborator.status===true){
+            	cnt += 1
                 return <div>
+                {cnt===1?<h4 id="collabslist" style={{marginLeft:"10px"}}><b>Collaborators</b></h4>:null}
                             <p className="col-12 col-sm-9">{collaborator.username}</p>
                             {props.StoryDetails.creator==localStorage.getItem("username")?<p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#bb2124"}}></i></p>:null}
                         </div>
@@ -440,10 +443,13 @@ function WriteStory(props)
     }
 
     function PendingCollabTiles(myprops){
+    	var cnt = 0;
         if(props.StoryDetails.collab !== ""){
         return  props.StoryDetails.collab.map((collaborator,index)=>{
             if(collaborator.status===false){
+            	cnt += 1;
                 return <div>
+                {cnt === 1?<h4 style={{marginLeft:"10px"}}><b>Pending</b></h4>:null}
                             <p className="col-12 col-sm-9">{collaborator.username}</p>
                             {props.StoryDetails.creator==localStorage.getItem("username")?<p className="col-12 col-sm-3 pointer" onClick = {()=>delCollab(collaborator.username,collaborator.status,index)}><i className="fas fa-times-circle" style={{color:"#f0ad4e"}}></i></p>:null}
                         </div>
@@ -527,14 +533,14 @@ function WriteStory(props)
                         <div className="col-12 col-md-2">
                         {props.StoryDetails.creator==localStorage.getItem("username")?<input type="button" className = "btn btn-default mybtn" data-toggle="modal" data-target="#CollabModal" value="Add a Collaborator"></input>:null}
                         <br />
-                        <h4 style={{marginLeft:"10px"}}><b>Collaborators</b></h4>
+                      
                         {
                             <CollabTiles />
                         }
                         <br />
                         <br />
                         <br />
-                        <h4 style={{marginLeft:"10px"}}><b>Pending</b></h4>
+                        
                         {
                             <PendingCollabTiles />
                         }
