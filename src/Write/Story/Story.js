@@ -209,8 +209,8 @@ function WriteStory(props)
                         //accept notif is in only creators db
                         //remove the accept notif from creators db
                         db.firestore().collection('notifications').doc(props.StoryDetails.creator).update({
-                            notiflist: firebase.firestore.FieldValue.arrayUnion({
-                                from : localStorage.getItem('username') , 
+                            notiflist: firebase.firestore.FieldValue.arrayRemove({
+                                from : uname , 
                                 action: '/ReadStory?title='+ props.title + "&StoryId="+ props.StoryDetails.id , 
                                 contentname : "collab accept" ,
                             }) 
