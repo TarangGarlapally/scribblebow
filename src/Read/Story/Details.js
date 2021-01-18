@@ -484,7 +484,7 @@ function StoryDetails(props)
                 </div>
                 
             {invite===true?
-            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id} creator= {props.myStoryDetails.creator} />
+            <AcceptInvite details = {myStoryDetails} title={props.title} id={props.id} creator= {myStoryDetails.creator} />
             :null
             }
         </div>
@@ -512,7 +512,7 @@ function AcceptInvite(props){
     }
 
     function acceptReq(){
-        var click_action  = "/ReadStory?title="+props.title + "&StoryId="+props.id  ; 
+         
         db.firestore().collection(Atts.documentName[props.title]).doc(props.id).update({
             collab: firebase.firestore.FieldValue.arrayRemove({username: localStorage.getItem("username"),status:false})
         }).then(err=>{
@@ -529,7 +529,7 @@ function AcceptInvite(props){
                 db.firestore().collection('notifications').doc(props.creator).update({
                     notiflist: firebase.firestore.FieldValue.arrayUnion({
                         from : localStorage.getItem('username') , 
-                        action :click_action , 
+                        action :"/ReadStory?title="+props.title + "&StoryId="+props.id , 
                         contentname : "collab accept" ,
                     }) 
                 })
