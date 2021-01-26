@@ -6,7 +6,55 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import EditSettings from "../Write/Profile/EditSettings";
+import { AttachFileSharp } from '@material-ui/icons';
+import * as Atts from '../Write/Story/Atts' ; 
 
+class Notifications extends React.Component {
+  
+  constructor(props){
+    super(props);
+    this.state = {stage:0 , Notifications: []  }
+  }
+  shouldComponentUpdate(nextProps, nextState){
+    if(this.props.userName === nextProps.userName && 
+      this.state.stage === nextState.stage && 
+      this.state.Notifications.length === nextState.Notifications.length)return false ; else return true ; 
+  }
+  GetNotifications(){
+    db.firestore().collection("notifications").doc(localStorage.getItem('username'))
+            .get().then(qs =>{
+              if(qs.exists){
+                console.log("got the data" , qs.data())
+                this.setState({stage:1, Notifications: qs.data().notiflist})
+              }else {
+                this.setState({stage:1})
+              }
+            }).catch(err => console.log(err)) ; 
+  }
+  render(){
+    this.GetNotifications() ; 
+    console.log(this.state.Notifications , "Notifications") ; 
+    if(this.state.stage === 0){
+      return <div>Loding Notifications...</div>
+    }
+    else if(this.state.stage ===1 ){
+      return (<div>
+          {this.state.Notifications.reverse().map((eachNotif , index)=>{
+            return (
+              <a className="container-inner fluid " style = {{wordWrap:"pre-wrap" , padding :"10px" , textDecoration :"none" }} key = {index} href = {eachNotif.action}>
+                <div className= "notifs" >
+                  <h4 style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>@{eachNotif.from}</h4>
+                  <p>{eachNotif.contentname}</p>
+                </div>
+                <hr style = {{margin:"0px"}}></hr>
+              </a> 
+            ) ; 
+          })}
+          {this.state,Notifications.length == 0 ? "No recent notifications" : null}
+      </div>)
+    }
+  }
+}
 function Navbar(props)
 {
 
@@ -22,11 +70,6 @@ function Navbar(props)
     var forhome = <ul className="nav navbar-nav ">
     <li><a className="nav-btn pointer" onClick={()=>{history.push("/Create")}}>CREATE</a></li>
     <li><a className="nav-btn pointer" onClick={()=>{history.push("/discover")}}>DISCOVER</a></li>
-    {/* {ckd===0?<li><a className="nav-btn"  onClick={searchClicked} > <i className="fa fa-search"></i></a></li>:null}
-    {ckd===0?null:<li><div className="search-bar"  style={{marginTop:"10px"}}>
-                <i className="fa fa-search"></i>
-                <input type="text" className="search-input" placeholder="Search" />
-            </div></li>} */}
         
 </ul> ; 
 
@@ -51,9 +94,19 @@ function Navbar(props)
       
      <ul className="nav navbar-nav navbar-right">
               <li><a className="nav-btn pointer" onClick={()=>{history.push("/my-shelf")}}>MY SHELF</a></li>
-              <li><a className="nav-btn" style={{display:"none"}} href=""><i className="fa fa-bell" aria-hidden="true"></i></a></li>
+              <li><a className="dropdown-toggle" type="button" data-toggle="dropdown" href="#"><i className="fa fa-bell" aria-hidden="true"></i></a>
+                  <ul className="dropdown-menu" >
+                      <li ><a style={{fontWeight:"bold"}}>Recent Notifications</a></li>
+                      <hr></hr>
+                      <div className="container fluid myscroller-notrack" style = {{width:"400px" , height:"400px" , overflowY: "auto"}}>
+                        <Notifications userName = {props.userName} history = {history}></Notifications>
+                      </div>
+                       
+                  </ul>
+              </li>
 
-            <li><a href="#" className="dropdown-toggle" type="button" data-toggle="dropdown"><span className="glyphicon glyphicon-user"></span><span className="caret"></span></a>
+            <li><a href="#" className="dropdown-toggle" type="button" data-toggle="dropdown"><span className="glyphicon glyphicon-user"></span><span className="caret"></span>
+            </a>
                   <ul className="dropdown-menu">
                   <li ><a style={{fontWeight:"bold"}}>{props.Username}</a></li>
                   <hr></hr>
