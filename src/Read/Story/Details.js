@@ -180,7 +180,6 @@ function StoryDetails(props)
                     });
                     setAllComments([thePushComment]) ;
                 }
-                console.log(LikeCommentCount.comments+1 , "ncomments Update") ; 
                 db.firestore().collection(Atts.documentName[props.title]).doc(myStoryDetails.myid).update(
                     {
                         "ncomments": firebase.firestore.FieldValue.increment(1)  
