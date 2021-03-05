@@ -8,6 +8,8 @@ import Button from '@material-ui/core/Button';
 import EditSettings from "../Write/Profile/EditSettings";
 import { AttachFileSharp } from '@material-ui/icons';
 import * as Atts from '../Write/Story/Atts' ; 
+import SwipeableDrawer from '@material-ui/core/Drawer';
+import {Img} from 'react-image';
 
 class Notifications extends React.Component {
   
@@ -35,22 +37,47 @@ class Notifications extends React.Component {
     this.GetNotifications() ; 
     console.log(this.state.Notifications , "Notifications") ; 
     if(this.state.stage === 0){
-      return <div>Loding Notifications...</div>
+      return <div className="font0" style={{textAlign:"center",marginTop:"20px"}}>Loding Notifications...</div>
     }
     else if(this.state.stage ===1 ){
       return (<div>
+      <h4 className="font0" style={{paddingLeft:"20px"}}>Recent Notifications</h4>
           {this.state.Notifications.reverse().map((eachNotif , index)=>{
-            return (
-              <a className="container-inner fluid " style = {{wordWrap:"pre-wrap" , padding :"10px" , textDecoration :"none" }} key = {index} href = {eachNotif.action}>
-                <div className= "notifs" >
-                  <h4 style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>@{eachNotif.from}</h4>
-                  <p>{eachNotif.contentname}</p>
-                </div>
-                <hr style = {{margin:"0px"}}></hr>
-              </a> 
-            ) ; 
+            if (eachNotif.from !== localStorage.getItem("username")){
+              return (
+                <a className="container-inner fluid nocopy font0" style = {{wordWrap:"pre-wrap" , textDecoration :"none" }} key = {index} href = {eachNotif.action}>
+                  <div className= " notifs" style={{display: "flex", justifyContent: "space-between"}} >
+                    <div style={{ height: "30px", width: "30px", borderRadius: "50%", marginRight: "10px", backgroundColor: "white" }}>
+                      <Img className="pointer" alt="profile-pic small" style={{ height: "30px", width: "30px", borderRadius: "50%" }} src={["https://firebasestorage.googleapis.com/v0/b/scribblebow.appspot.com/o/ProfileImages%2F"+eachNotif.from+"?alt=media&token=b75480b9-dff3-400f-8009-04153790c3bb",'https://firebasestorage.googleapis.com/v0/b/scribblebow.appspot.com/o/ScribbleBow%2Fmyimage.png?alt=media&token=fcc7366e-7b03-4a96-aa82-922fd7fa426a']}/>
+                    </div>
+
+                  <div >
+                  {eachNotif.contentname === "collab"?
+                    <p><span style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>{eachNotif.from}</span> has requested you to collaborate on their content</p>
+                  :null}
+                  {eachNotif.contentname === "comment"?
+                    <p><span style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>{eachNotif.from}</span> has {eachNotif.contentname+"ed"} on your content</p>
+                    :null
+                  }
+                  {eachNotif.contentname === "like"?
+                    <p><span style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>{eachNotif.from}</span> has {eachNotif.contentname+"d"} your content</p>
+                    :null
+                  }
+                  {eachNotif.contentname === "follow"?
+                    <p><span style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>{eachNotif.from}</span> started following you</p>
+                    :null
+                  }
+                  </div>
+                  </div>
+                  <hr style = {{margin:"0px"}}></hr>
+                </a> 
+                
+              );
+            }else{
+              return null;
+            }
           })}
-          {this.state.Notifications.length == 0 ? "No recent notifications" : null}
+          {this.state.Notifications.length === 0 ? "No recent notifications" : null}
       </div>)
     }
   }
@@ -59,6 +86,7 @@ function Navbar(props)
 {
 
     const [open,setOpen] = useState(false);
+    const [notif,setNotif] = useState(false);
     var currentLocation = window.location.pathname;
     var history = useHistory() ; 
 
@@ -76,7 +104,12 @@ function Navbar(props)
     
 
     return (<nav className="navbar mynav fixed-top navbar-expand-md" id="navbar" style={{}}>
-
+        <SwipeableDrawer anchor={"right"} open={notif} onClose={()=>{setNotif(false)}} onOpen={()=>{setNotif(true)}}>
+            <div style={{padding:"10px",width:"50vh"}}>
+            <Notifications userName = {props.userName} history = {history}/>
+            </div>
+            
+        </SwipeableDrawer>
     <div className="container-fluid ">
 
        <a className="navbar-brand nav-btn pointer" onClick={()=>{history.push("/home")}} >HOME</a>
@@ -94,7 +127,8 @@ function Navbar(props)
       
      <ul className="nav navbar-nav navbar-right">
               <li><a className="nav-btn pointer" onClick={()=>{history.push("/my-shelf")}}>MY SHELF</a></li>
-              <li><a className="dropdown-toggle" type="button" data-toggle="dropdown" href="#"><i className="fa fa-bell" aria-hidden="true"></i></a>
+              <li><a className="nav-btn pointer" onClick={()=>{setNotif(true)}}><i className="fa fa-bell" aria-hidden="true"></i></a></li>
+              {/* <li><a className="dropdown-toggle" type="button" data-toggle="dropdown" href="#"><i className="fa fa-bell" aria-hidden="true"></i></a>
                   <ul className="dropdown-menu" >
                       <li ><a style={{fontWeight:"bold"}}>Recent Notifications</a></li>
                       <hr></hr>
@@ -103,7 +137,7 @@ function Navbar(props)
                       </div>
                        
                   </ul>
-              </li>
+              </li> */}
 
             <li><a href="#" className="dropdown-toggle" type="button" data-toggle="dropdown"><span className="glyphicon glyphicon-user"></span><span className="caret"></span>
             </a>
@@ -141,6 +175,8 @@ function Navbar(props)
         
         <EditSettings />
         </Dialog>
+
+       
    </div>
    </nav>) ; 
 }
