@@ -50,7 +50,7 @@ class Notifications extends React.Component {
               </a> 
             ) ; 
           })}
-          {this.state,Notifications.length == 0 ? "No recent notifications" : null}
+          {this.state.Notifications.length == 0 ? "No recent notifications" : null}
       </div>)
     }
   }
