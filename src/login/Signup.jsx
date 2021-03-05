@@ -1,5 +1,6 @@
 import React,{useCallback, useState, useContext} from 'react';
 import {withRouter, Redirect, useHistory} from "react-router";
+import Axios from 'axios';
 import db from "../database/db";
 import { UserUid } from '../database/funcs';
 import { AuthContext } from '../Auth';
@@ -163,6 +164,12 @@ function Signup(props) {
                 <div className="form-group" style={{ width: "80%" }}>
                     <label for="password">Verify your password</label>
                     <input type="password" className="form-control" name="password" id="password" onChange={handleChange} placeholder="Re-enter the password"  value={newuser.password} required/>
+                </div>
+                <div>
+                <a onClick={() =>{ Axios.get(
+                    "Access-Control-Allow-Origin:https://passwordgenerator-api.herokuapp.com/get-pwd?name="+newuser.fname +"&date=19-03-2001")
+                    .then((res) => {console.log(res)}).catch(err =>console.log(err))} }>
+                generate</a>
                 </div>
                 {(pcheck===1)?<p className="font0" style={{color: "red"}}>Passwords don't match</p>: null}
                 {(pcheck===2)?<p className="font0" style={{color: "red"}}>Passwords should be atleast 8 characters long</p>: null}

@@ -11,6 +11,7 @@ import StoryDetails from "../../Read/Story/Details";
 import * as firebase from 'firebase';
 import MySnackBar from "../../components/SnackBar";
 import { sendTokenToServer } from "../../Notifications/client";
+import Picker from 'emoji-picker-react';
 
 function WriteStory(props)
 {
@@ -227,7 +228,14 @@ function WriteStory(props)
         })
     }
 
-
+   function EmojiChange(event , Selected_Emoji){
+        setStoryStatus(prevValue =>{
+            return {
+                ...prevValue,
+                "StoryContent" : prevValue.StoryContent + Selected_Emoji.emoji,
+            };
+        });
+   }
    function handleStoryStatus(event)
    {
         var {name,value} = event.target;
@@ -492,6 +500,12 @@ function WriteStory(props)
                                 />
                                 {ArticleType}
                                 {fanFiction}
+
+                                
+                                <Picker onEmojiClick={EmojiChange} />
+
+
+                                
                                 <h4>Description</h4>
                                 <textarea className={Atts.propsClass}  type= "text"  name = "StoryDescription"
                                 style={{height:"100px", resize:"none"}} onChange={handleStoryStatus}  value={StoryStatus.StoryDescription} ></textarea>
@@ -504,9 +518,9 @@ function WriteStory(props)
                                 <div className="myscroller" id="ShowHashtags" style={{width:"300px",maxWidth:"300px",height:"100px",maxHeight:"100px",
                                 justifyContent:"wrap", overflowY:"auto"}}
                                 ></div>
-
-                                <h4>Part</h4><input className={Atts.propsClass} style={{width:"80px" }} type="number" onChange={handleStoryStatus} name="part"
-                                 value={StoryStatus.part}></input>
+                                <div style={{display:"none"}}> <h4>Part</h4><input className={Atts.propsClass} style={{width:"80px" }} type="number" onChange={handleStoryStatus} name="part"
+                                 value={StoryStatus.part}></input></div>
+                               
                                 {UploadImage}
                                 <br />
                                 

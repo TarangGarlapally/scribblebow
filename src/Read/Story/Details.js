@@ -152,6 +152,8 @@ function StoryDetails(props)
         setLikeState(!LikeState) ;
         
     }
+
+    //comment submission handling 
     function handleCommentSubmit(event)
     {
         event.preventDefault(); 
@@ -180,7 +182,7 @@ function StoryDetails(props)
                 }
                 db.firestore().collection(Atts.documentName[props.title]).doc(myStoryDetails.myid).update(
                     {
-                        "ncomments": myStoryDetails.ncomments+1 
+                        "ncomments": firebase.firestore.FieldValue.increment(1)  
                     }
                 );
                 //Add Notification to db 
@@ -437,7 +439,6 @@ function StoryDetails(props)
                     }): null}
                 </div>
                 {LikeCommentAdd}
-                <Reader content={myStoryDetails.content}/>
                 <div name= "EditnDelete" className= "handy" onClick ={expandEditnDelete} style={{display : currLoc !="/ReadStory" ?"none":"flex" , justifyContent:"flex-end" }}
                 ><img src={process.env.PUBLIC_URL +"3Dots.png"}  style={{ maxHeight:"40px" , maxWidth:"40px"}} ></img></div>
                 
@@ -480,6 +481,7 @@ function StoryDetails(props)
                             addedComments={AllStoryComments} 
                             creator={myStoryDetails.creator} 
                             title = {props.title}
+                            setLikeCommentCount= {setLikeCommentCount}
                             />
                 </div>
                 
@@ -729,7 +731,14 @@ class Comments extends React.Component
                                                     "ncomments" : this.state.AllStoryComments.comments.length -1 
                                                     
                                                 }).then( qs =>{
-                                                    this.setState({stage:0}) ; 
+                                                    this.props. setLikeCommentCount(preval =>{
+                                                        return {  
+                                                             ...preval,
+                                                            "comments": preval.comments- 1 
+                                                        
+                                                        }
+                                                    });
+                                                        this.setState({stage:0}) ; 
                                                 }) 
                                                
 
@@ -848,29 +857,3 @@ export {StoryContent , StoryDetails , CoverPage , Comments};
 // }
 
 
-
-
-class Reader extends React.Component{
-    // constructor(props){
-    //     super(props);
-    //     this.state = {content:this.props.content}
-    //     this.synth = window.speechSynthesis;
-    // }
-    
-
-
-    // readAloud = ()=>{
-    //     var utterThis = new SpeechSynthesisUtterance(this.state.content);
-    //     this.synth.speak(utterThis);
-    //     console.log(this.props.content);
-    // }
-    // PauseAudio = ()=>{
-    //     this.synth.pause();
-    // }
-    render(){
-        return <div>
-        {/* <a onClick={()=>{this.readAloud();}}>Read Aloud</a>
-        <a onClick={()=>{this.PauseAudio();}}>Pause</a>
-         */}</div>
-    }   
-}
