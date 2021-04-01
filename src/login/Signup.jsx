@@ -103,7 +103,7 @@ function Signup(props) {
           const url = 'https://spring-feather-5dc4.karthik-pasupulatei.workers.dev?https://passwordgenerator-api.herokuapp.com/get-pwd';
 
           // request data object
-          const data ="name=Tarang" ;
+          const data ="name="+newuser.fname+newuser.lname+"tarang" + "&date=19-02-1984" ;
   
           // set the headers
           const config = {
