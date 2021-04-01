@@ -24,6 +24,7 @@
     "js-cookie": "^2.2.1",
     "mdbreact": "^4.27.0",
     "prop-types": "^15.7.2",
+    "qs": "^6.10.1",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
     "react-canvas-js": "^1.0.1",

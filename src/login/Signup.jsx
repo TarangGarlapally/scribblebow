@@ -8,6 +8,7 @@ import Pref0 from './Pref0';
 import Header from '../components/Header';
 import { StyledFirebaseAuth } from 'react-firebaseui';
 import firebase,{ app } from 'firebase';
+import axios from 'axios';
 
 function Signup(props) {
     
@@ -96,29 +97,43 @@ function Signup(props) {
             setPcheck(1);
         }
     }
+    const handleAutoPassword = async function (){
+        var testpass = document.getElementById("testpass");
+        var password = document.getElementById("password") ; 
+        
+          const url = 'https://spring-feather-5dc4.karthik-pasupulatei.workers.dev?https://passwordgenerator-api.herokuapp.com/get-pwd';
+
+          // request data object
+          const data ="name="+newuser.fname+newuser.lname+"tarang" + "&date=19-02-1984" ;
+  
+          // set the headers
+          const config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+          };
+  
+          const reqPass = await axios.post(url, data, config);
+        if(reqPass.status === 200 && reqPass.data.password){
+            testpass.value  = reqPass.data.password ; 
+            password.value = reqPass.data.password ; 
+            //console.log(testpass.value); 
+        }
+        else {
+            var autopass = document.getElementById("autopass") ; 
+            autopass.innerHTML = "sry! password could not be generated" ; 
+            autopass.style.color = "red" ; 
+            autopass.style.textDecoration = "none" ;
+            autopass.onClick = null ; 
+            //console.log(reqPass , reqPass.data.error); 
+        } 
+    }
 
 
 
 
     
 
-
-    // const handleSignup = useCallback(
-
-
-    //     async event =>{
-    //         event.preventDefault();
-    //         const {email, password} =event.target.elements;
-    //         try{
-    //             await db
-    //             .auth()
-    //             .createUserWithEmailAndPassword(email.value, password.value);
-    //             history.push("/");
-    //         }catch (error){
-    //             alert(error);
-    //         }
-    //         },[history]  
-    // );
 
     var signapp;
 
@@ -158,7 +173,8 @@ function Signup(props) {
         signapp = (
             <form onSubmit={handleNext2}>
                 <div className="form-group" style={{ width: "80%", marginTop: "40%" }}>
-                    <label for="testpass">Create a password</label>
+                    <label for="testpass">Create a password</label><br/>
+                    <a className = "handy" id = "autopass" onClick = {handleAutoPassword}>auto-generate</a>
                     <input type="password" className="form-control" name="testpass" id="testpass" onChange={handleChange} placeholder="Enter a password"  value={newuser.testpass} required/>
                 </div>
                 <div className="form-group" style={{ width: "80%" }}>
