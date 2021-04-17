@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import db from '../database/db' ;
-import { Redirect, useHistory } from "react-router";
+import {  useHistory } from "react-router";
 import Dialog from '@material-ui/core/Dialog';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import EditSettings from "../Write/Profile/EditSettings";
-import { AttachFileSharp } from '@material-ui/icons';
 import * as Atts from '../Write/Story/Atts' ; 
 import SwipeableDrawer from '@material-ui/core/Drawer';
 import {Img} from 'react-image';
@@ -87,7 +86,6 @@ function Navbar(props)
 
     const [open,setOpen] = useState(false);
     const [notif,setNotif] = useState(false);
-    var currentLocation = window.location.pathname;
     var history = useHistory() ; 
 
     function handleClose(){

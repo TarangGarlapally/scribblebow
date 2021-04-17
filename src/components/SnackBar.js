@@ -1,6 +1,4 @@
 import React from 'react'
-import { useSnackbar } from 'react-simple-snackbar'
-import * as Atts from "../Write/Story/Atts"  ; 
 import Slide from '@material-ui/core/Slide';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';

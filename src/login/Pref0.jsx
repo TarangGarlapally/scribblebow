@@ -1,17 +1,14 @@
 import React, { useContext, useState } from "react";
 import db from "../database/db";
 import { AuthContext } from "../Auth";
-import { Redirect, useHistory } from "react-router";
-import { UserUid, Username } from '../database/funcs';
+import {  useHistory } from "react-router";
 import Pref1 from "./Pref1";
-import Signup from "./Signup";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
 
 function Pref0(props){
     const {currentUser} =useContext(AuthContext);
     const [twait,setTWait] = useState(0);
-    const [p,setP] = useState(0);
     const history = useHistory();
     const [newuser,setUser] = useState({
         bio: "I am a Creator (Default)",
@@ -102,13 +99,12 @@ function Pref0(props){
 
     const handleNext=function(event){
         event.preventDefault();
-        const {bio, title} =event.target.elements;
         const custom_id = props.newuser.email.split("@")[0];
         db.firestore().collection("users").doc(custom_id).update({
             bio: newuser.bio,
             title: newuser.title
         });
-        if(localStorage.getItem("emailverif")=="true"){
+        if(localStorage.getItem("emailverif")==="true"){
             history.push("/home");
         }
         else{
@@ -168,7 +164,7 @@ function Pref0(props){
             <div className="login-bar">
             
                 <form onSubmit={handleNext}>
-                <img className="signuplogo2" src={process.env.PUBLIC_URL + '/myimage.png'}/>
+                <img className="signuplogo2" alt = "sign up logo" src={process.env.PUBLIC_URL + '/myimage.png'}/>
                         <div className="form-group" style={{ width: "80%", margin: "20px" }}>
                             <label for="bio">Say something about yourself</label>
                             <input type="text" className="form-control" name="bio" id="bio" onChange={handleChange} placeholder="Your Bio (Optional)"  value={newuser.bio}/>

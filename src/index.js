@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom";
 import { AuthProvider } from './Auth';

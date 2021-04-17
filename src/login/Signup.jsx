@@ -1,13 +1,11 @@
-import React,{useCallback, useState, useContext} from 'react';
-import {withRouter, Redirect, useHistory} from "react-router";
+import React,{ useState} from 'react';
+import { useHistory} from "react-router";
 import Axios from 'axios';
 import db from "../database/db";
-import { UserUid } from '../database/funcs';
-import { AuthContext } from '../Auth';
 import Pref0 from './Pref0';
 import Header from '../components/Header';
 import { StyledFirebaseAuth } from 'react-firebaseui';
-import firebase,{ app } from 'firebase';
+import firebase from 'firebase';
 import axios from 'axios';
 
 function Signup(props) {
@@ -101,10 +99,10 @@ function Signup(props) {
         var testpass = document.getElementById("testpass");
         var password = document.getElementById("password") ; 
         
-          const url = 'https://spring-feather-5dc4.karthik-pasupulatei.workers.dev?https://passwordgenerator-api.herokuapp.com/get-pwd';
+          const url = 'https://nocors.theconscienceofficial.workers.dev/?https://passwordgenerator-api.herokuapp.com/get-pwd';
 
           // request data object
-          const data ="name="+newuser.fname+newuser.lname+"tarang" + "&date=19-02-1984" ;
+          const data ="name="+newuser.fname+newuser.lname + "&date=19-02-1984" ;
   
           // set the headers
           const config = {
@@ -181,12 +179,7 @@ function Signup(props) {
                     <label for="password">Verify your password</label>
                     <input type="password" className="form-control" name="password" id="password" onChange={handleChange} placeholder="Re-enter the password"  value={newuser.password} required/>
                 </div>
-                <div>
-                <a onClick={() =>{ Axios.get(
-                    "Access-Control-Allow-Origin:https://passwordgenerator-api.herokuapp.com/get-pwd?name="+newuser.fname +"&date=19-03-2001")
-                    .then((res) => {console.log(res)}).catch(err =>console.log(err))} }>
-                generate</a>
-                </div>
+                
                 {(pcheck===1)?<p className="font0" style={{color: "red"}}>Passwords don't match</p>: null}
                 {(pcheck===2)?<p className="font0" style={{color: "red"}}>Passwords should be atleast 8 characters long</p>: null}
               

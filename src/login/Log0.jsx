@@ -22,7 +22,7 @@ export default function Log0(){
         }
         
         setTimeout(function(){
-            if(localStorage.getItem("emailverif")=="true"){
+            if(localStorage.getItem("emailverif")==="true"){
                 IntitalizeFireBaseMessaging() ; 
                 history.push("/");
             }

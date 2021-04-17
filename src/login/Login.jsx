@@ -1,9 +1,7 @@
-import React,{useCallback, useContext, useState} from 'react';
-import {withRouter, Redirect} from "react-router";
+import React,{useCallback,  useState} from 'react';
+import { Redirect} from "react-router";
 import db from "../database/db";
-import {AuthContext} from "../Auth";
-import firebase,{ app } from 'firebase';
-import { Username } from '../database/funcs';
+import firebase from 'firebase';
 import Header from '../components/Header';
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 
@@ -37,7 +35,7 @@ function Login({history}) {
     );
 
 
-    const {currentUser} = useContext(AuthContext);
+
 
     if(localStorage.getItem("username")){
        return <Redirect to="/" />;
@@ -111,7 +109,7 @@ function Login({history}) {
         <div className="login-bar">
 
             <div className="col-md-6" style={{ paddingLeft: "4%" }}> 
-            <img className="loginlogo" src={process.env.PUBLIC_URL + '/myimage.png'}/>
+            <img className="loginlogo" alt = "logo" src={process.env.PUBLIC_URL + '/myimage.png'}/>
            {fpass===4?<p style={{marginTop:"60px"}}>We've mailed you the link to reset your password. Please reset your password using the link.</p>:mainlog}
           
                </div>
