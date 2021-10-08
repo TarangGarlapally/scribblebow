@@ -373,6 +373,8 @@ function StoryDetails(props)
                                         }); 
                                         console.log(qs. docs. map(doc => doc. data()) , "Myshelf docs" ) ; 
                                     })
+
+                                    // removed from myshelf 
                                     db.firestore().collection('users').doc(myStoryDetails.creator).update(
                                         {
                                             [Atts.documentName[props.title]] : firebase.firestore.FieldValue.increment(-1)

@@ -266,6 +266,32 @@ export default function Quote(props)
                                             "quotes":  firebase.firestore.FieldValue.increment(-1) 
                                         }
                                     )
+                                    db.firestore().collection("myshelf").get().then(qs=>{
+
+                                        qs.docs.map(user => {
+                                            
+                                            let shelf  = user.data()[Atts.documentName[props.title]] ;
+
+                                            
+                                            shelf.forEach( (contentId)=>{
+                                                if (contentId === props.QuoteId){
+                                                    
+                                                    db.firestore().collection('myshelf').doc(user.id).update(
+                                                        {
+                                                            [Atts.documentName[props.title]] : firebase.firestore.FieldValue.arrayRemove(contentId) 
+                                                        }
+                                                    ) ;
+
+                                                    
+                                                }
+                                            } ); 
+                                            // end of For
+
+                                        }); 
+                                        console.log(qs. docs. map(doc => doc. data()) , "Myshelf docs" ) ; 
+                                    })
+
+                                    // removed from myshelf 
                                     
                                     history.push({
                                     pathname: '/Profile',
