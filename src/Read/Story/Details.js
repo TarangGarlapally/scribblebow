@@ -7,7 +7,9 @@ import * as Atts from '../../Write/Story/Atts';
 import { Redirect, useHistory } from "react-router";
 import db from '../../database/db';
 import * as firebase from 'firebase';
-import {sendTokenToServer} from '../../Notifications/client' ; 
+import {sendTokenToServer} from '../../Notifications/client' ;
+
+
 function StoryDetails(props)
 {
     
@@ -346,7 +348,31 @@ function StoryDetails(props)
                                     storage.ref("CoverPages/" + (myStoryDetails.myid)).delete() ; 
                                     db.firestore().collection("likes").doc(myStoryDetails.myid).delete() ; 
                                     db.firestore().collection("comments").doc(myStoryDetails.myid).delete() ; 
-            
+                                    
+                                    db.firestore().collection("myshelf").get().then(qs=>{
+
+                                        qs.docs.map(user => {
+                                            
+                                            let shelf  = user.data()[Atts.documentName[props.title]] ;
+
+                                            
+                                            shelf.forEach( (contentId)=>{
+                                                if (contentId === myStoryDetails.myid){
+                                                    
+                                                    db.firestore().collection('myshelf').doc(user.id).update(
+                                                        {
+                                                            [Atts.documentName[props.title]] : firebase.firestore.FieldValue.arrayRemove(contentId) 
+                                                        }
+                                                    ) ;
+
+                                                    
+                                                }
+                                            } ); 
+                                            // end of For
+
+                                        }); 
+                                        console.log(qs. docs. map(doc => doc. data()) , "Myshelf docs" ) ; 
+                                    })
                                     db.firestore().collection('users').doc(myStoryDetails.creator).update(
                                         {
                                             [Atts.documentName[props.title]] : firebase.firestore.FieldValue.increment(-1)
@@ -365,7 +391,8 @@ function StoryDetails(props)
                                     ) ; 
                                     
                                 }}   style={{width:"100px" , marign:"5px"}}>Yes</button>
-                                <button type="button" className="btn btn-default" data-dismiss="modal" style={{width:"100px" , marign:"5px"}}>No</button>
+                                <button type="button" className="btn btn-default" data-dismiss="modal" style={{width:"100px" , marign:"5px"}}
+                                >No</button>
                             </div>
                             </div>
 
