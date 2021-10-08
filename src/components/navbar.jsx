@@ -51,7 +51,7 @@ class Notifications extends React.Component {
                     </div>
 
                   <div >
-                  {eachNotif.contentname === "collab"?
+                  {eachNotif.contentname === "collab invite"?
                     <p><span style={{fontWeight:"bold" , color: Atts.getHashClassName(eachNotif.from.length) }}>{eachNotif.from}</span> has requested you to collaborate on their content</p>
                   :null}
                   {eachNotif.contentname === "comment"?
@@ -122,20 +122,10 @@ function Navbar(props)
        <div className="collapse navbar-collapse" id="Cnav">
     
         {forhome}
-      
      <ul className="nav navbar-nav navbar-right">
               <li><a className="nav-btn pointer" onClick={()=>{history.push("/my-shelf")}}>MY SHELF</a></li>
               <li><a className="nav-btn pointer" onClick={()=>{setNotif(true)}}><i className="fa fa-bell" aria-hidden="true"></i></a></li>
-              {/* <li><a className="dropdown-toggle" type="button" data-toggle="dropdown" href="#"><i className="fa fa-bell" aria-hidden="true"></i></a>
-                  <ul className="dropdown-menu" >
-                      <li ><a style={{fontWeight:"bold"}}>Recent Notifications</a></li>
-                      <hr></hr>
-                      <div className="container fluid myscroller-notrack" style = {{width:"400px" , height:"400px" , overflowY: "auto"}}>
-                        <Notifications userName = {props.userName} history = {history}></Notifications>
-                      </div>
-                       
-                  </ul>
-              </li> */}
+              
 
             <li><a href="#" className="dropdown-toggle" type="button" data-toggle="dropdown"><span className="glyphicon glyphicon-user"></span><span className="caret"></span>
             </a>
@@ -149,13 +139,15 @@ function Navbar(props)
                             state:{id: localStorage.getItem('username') ,  key:localStorage.getItem('username')},
                         })
                     }}>Profile</a></li>
+                    
                     <li><a className="pointer" onClick={()=> {setOpen(true)}}>Settings</a></li>
                     <li><a className="pointer" onClick={()=>{history.push("/Report")}}>Report</a></li>
                     <li><a href = "/" type= "button" onClick={()=> {localStorage.clear();db.auth().signOut()}}>Logout</a></li>
                 </ul>
           </li>
        </ul>
-   </div>
+   </div>  
+   {/* end of Collapse */}
  
    <Dialog fullScreen open={open}   scroll={"body"}>
          <div className="myshadow2" style={{height:"150px",color:"white",backgroundColor:"#f5ba13"}} >
