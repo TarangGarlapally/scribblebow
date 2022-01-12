@@ -1,6 +1,5 @@
 import React,{ useState} from 'react';
 import { useHistory} from "react-router";
-import Axios from 'axios';
 import db from "../database/db";
 import Pref0 from './Pref0';
 import Header from '../components/Header';

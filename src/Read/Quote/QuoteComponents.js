@@ -7,6 +7,8 @@ import * as firebase from 'firebase';
 import { useHistory } from 'react-router';
 import { sendTokenToServer } from '../../Notifications/client';
 import { ScrollTo } from "react-scroll-to";
+import axios from 'axios';
+
 
 export default function Quote(props)
 {
@@ -59,11 +61,29 @@ export default function Quote(props)
 
         setMyShelf(!myShelf) ; 
     }
-    function handleCommentSubmit(event)
+    async function handleCommentSubmit(event)
     {
         event.preventDefault(); 
         console.log("THe event triggerd "); 
         let theComment = event.target.QuoteComment.value ;
+
+        const url = "https://vulgar-word-detection.herokuapp.com/detectWords";
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+              }
+          };
+
+        const data = {
+            text: theComment 
+        };
+
+        if((await axios.post(url, data, config)).data.toxic){
+            alert("Your comment goes against our policies! Please rephrase it.");
+            return;
+        }
+
+
         if(theComment !== "")
         {
                 let thePushComment = {"user": localStorage.getItem('username'), "comment" : theComment} ;

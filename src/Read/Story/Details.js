@@ -8,6 +8,8 @@ import { Redirect, useHistory } from "react-router";
 import db from '../../database/db';
 import * as firebase from 'firebase';
 import {sendTokenToServer} from '../../Notifications/client' ;
+import axios from 'axios';
+
 
 
 function StoryDetails(props)
@@ -156,11 +158,29 @@ function StoryDetails(props)
     }
 
     //comment submission handling 
-    function handleCommentSubmit(event)
+    async function handleCommentSubmit(event)
     {
         event.preventDefault(); 
+
         console.log("THe event triggerd "); 
         let theComment = event.target.StoryComment.value ; 
+
+        const url = "https://vulgar-word-detection.herokuapp.com/detectWords";
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+              }
+          };
+
+        const data = {
+            text: theComment 
+        };
+
+        if((await axios.post(url, data, config)).data.toxic){
+            alert("Your comment goes against our policies! Please rephrase it.");
+            return;
+        }
+
         if(theComment != "")
         {
                     let thePushComment = {"user": localStorage.getItem('username'), "comment" : theComment} ;
