@@ -18,7 +18,7 @@
     "email-existence": "^0.1.6",
     "emoji-picker-react": "^3.4.2",
     "firebase": "^7.15.5",
-    "firebase-admin": "^8.13.0",
+    "firebase-admin": "^11.11.1",
     "firebase-functions": "^3.7.0",
     "fusioncharts": "^3.15.1-sr.1",
     "js-cookie": "^2.2.1",
