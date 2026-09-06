@@ -8,7 +8,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@material/snackbar": "^7.0.0",
     "@mdi/font": "^5.3.45",
-    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "axios": "^1.6.0",
